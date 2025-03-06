@@ -1,0 +1,192 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f4;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+@page {
+  size: 210mm 297mm; /* Размер A4 */
+  margin: 2mm; /* Устанавливаем минимальные отступы для границ страницы */
+}
+
+body {
+  margin: 0;
+}
+
+.container {
+  width: 100%;
+  height: auto; /* Даем контейнеру возможность автоматически адаптироваться */
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 70mm); /* 3 колонки по 70 мм */
+  grid-auto-rows: 37mm; /* Фиксированная высота строки для каждого ряда */
+  align-items: start;
+  justify-items: start;
+  gap: 0;
+  overflow: hidden;
+  align-content: stretch; /* Растягиваем контент, чтобы заполнить все пространство */
+}
+
+.sticker {
+  background-color: #fff;
+  width: 64mm; /* Уменьшаем ширину наклейки */
+  height: 37mm; /* Уменьшаем высоту стикера до 36 мм */
+  padding: 2mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding-right: 10px;
+  padding-left: 10px;
+  overflow: hidden;
+  page-break-inside: avoid;
+  word-wrap: break-word;
+  font-size: 8px; /* Уменьшаем размер шрифта для большей компактности */
+  line-height: 1.2; /* Уменьшаем межстрочный интервал для лучшего размещения */
+}
+
+/* Убираем отступ только для правой колонки, чтобы контент занимал всю доступную ширину */
+.container > .sticker:nth-child(3n) {
+  padding-right: 11px; /* Отступы теперь одинаковые для всех колонок */
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+.title__text {
+  font-size: 9px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.callorii {
+  font-size: 8px;
+  font-weight: 700;
+  color: #666;
+}
+
+.composition {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0;
+  font-size: 6px;
+}
+
+.composition__text {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Убираем все промежутки */
+}
+
+.ingredients {
+  margin: 0;
+  padding-bottom: 6px;
+  padding-top: 6px;
+}
+
+.allergens {
+  font-size: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.bio_image {
+  width: 20%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.img {
+  width: 30px;
+  height: auto;
+}
+
+.desc {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.desc__title {
+  font-size: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.portion {
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 5px;
+  gap: 3px;
+  margin: 0;
+  padding-bottom: 4px;
+}
+
+.desc__dowm {
+  font-size: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.footer {
+  padding: 0;
+  font-size: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.footer .footer__text {
+  width: 60%;
+  margin: 0;
+  padding: 0;
+}
+
+.net_mass_container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  font-size: 7px;
+  margin: 0;
+  padding: 0;
+}
+
+.net_mass_left {
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
+.data_right {
+  text-align: right;
+  margin: 0;
+  padding: 0;
+  font-size: 9px;
+  transform: translateX(-5px); /* Сдвигаем текст немного влево */
+}
+
+@media print {
+  .container {
+    page-break-before: always; /* Принудительный разрыв перед первой страницей */
+    page-break-after: always; /* Принудительный разрыв страницы после контейнера */
+    page-break-inside: avoid; /* Запрещаем разрыв внутри контейнера */
+  }
+
+  .sticker {
+    page-break-inside: avoid; /* Запрещаем разрыв страницы внутри наклейки */
+  }
+}

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generowanie Naklejek</title>
+    <link rel="stylesheet" href="/assets/stylescss/sticker.css" />
+    <style>
+        @media print {
+            .container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .sticker {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="stickers-container">
+        <!-- Стикеры будут динамически добавляться здесь -->
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Pobieramy dane z localStorage
+        const response = JSON.parse(localStorage.getItem('stickerData'));
+        console.log("Загруженные данные из localStorage для наклеек:", response);
+
+        // Если данных нет или они некорректны, возвращаемся на страницу заказов
+        if (!response || !response.packages || response.packages.length === 0) {
+            console.error("Ошибка: данные для генерации наклеек отсутствуют или некорректны.");
+            
+            if (!localStorage.getItem('stickerRedirectAttempted')) {
+                localStorage.setItem('stickerRedirectAttempted', 'true'); // Отмечаем, что перенаправление уже произошло
+                window.location.href = "/admin/orders_summary.php";
+            } else {
+                // Если перенаправление уже было, очищаем отметку и показываем сообщение об ошибке
+                localStorage.removeItem('stickerRedirectAttempted');
+                alert('Brak danych do generowania. Proszę spróbować ponownie.');
+            }
+            return;
+        }
+
+        // Убираем отметку о перенаправлении, если данные были успешно загружены
+        localStorage.removeItem('stickerRedirectAttempted');
+
+        // Сортируем packages сначала "Ś", потом "O", "P", "K"
+        response.packages.sort(function(a, b) {
+            const order = ['Ś', 'O', 'P', 'K'];
+            return order.indexOf(a.package.charAt(0)) - order.indexOf(b.package.charAt(0));
+        });
+
+        // Контейнер для наклеек
+        const stickersContainer = document.getElementById('stickers-container');
+        stickersContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых наклеек
+
+        // Форматируем дату
+        const dateParts = response.delivery_date.split('-');
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+        // Генерация HTML для каждой наклейки
+        response.packages.forEach(function (packageInfo) {
+            const packageLabel = packageInfo.package;
+            packageInfo.dishes.forEach(function (dish) {
+                const energy = parseFloat(dish.energy) ? parseFloat(dish.energy).toFixed(2) : '0.00';
+                const fat = parseFloat(dish.fat) ? parseFloat(dish.fat).toFixed(2) : '0.00';
+                const carbohydrates = parseFloat(dish.carbohydrates) ? parseFloat(dish.carbohydrates).toFixed(2) : '0.00';
+                const protein = parseFloat(dish.protein) ? parseFloat(dish.protein).toFixed(2) : '0.00';
+                const salt = parseFloat(dish.salt) ? parseFloat(dish.salt).toFixed(2) : '0.00';
+                const allergens = dish.allergens || 'Brak informacji';
+                const netMass = dish.net_mass ? `${dish.net_mass} ` : 'Brak informacji';
+
+                // Создаем новый элемент наклейки
+                const stickerElement = document.createElement('div');
+                stickerElement.classList.add('sticker');
+
+                stickerElement.innerHTML = `
+                    <div class="title">
+                        <h1 class="title__text">${dish.description}</h1>
+                        <div class="callorii">${packageLabel}</div>
+                    </div>
+                    <div class="composition">
+                        <div class="composition__text">
+                            <div class="ingredients">
+                               <strong>Składniki:</strong> ${dish.ingredients}
+                            </div>
+                            <div class="allergens">
+                                <strong>Alergeny:</strong> ${allergens}
+                            </div>
+                        </div>
+                        <div>
+                            <img src="/assets/img/sticker.png" alt="img" class="img" />
+                        </div>
+                    </div>
+                    <div class="desc">
+                        <h2 class="desc__title">Wartość odżywcza w porcji:</h2>
+                        <div class="portion">
+                            <div class="energy">Wartość energetyczna: <strong>${energy}</strong> kcal</div>
+                            <div class="fat">Tłuszcz: <strong>${fat}</strong> g</div>
+                            <div class="carbohydrates">Węglowodany: <strong>${carbohydrates}</strong> g</div>
+                            <div class="protein">Białko: <strong>${protein}</strong> g</div>
+                            <div class="sol">Sól: <strong>${salt}</strong> g</div>
+                        </div>
+                        <div class="desc__dowm">
+                            Wartość odżywcza jest przybliżona i może się różnić.
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <div class="footer__text">
+                            Przechowywać w temperaturze od 0°C do 8°C. Po otrzymaniu spożyć w ciągu 24 godzin.
+                        </div>
+                    </div>
+                    <div class="net_mass_container">
+                        <!-- Закомментирован блок с net_mass -->
+                        <!-- <div class="net_mass_left">
+                             Masa netto: <strong>${netMass}</strong><br/>
+                             Możliwa tolerancja wagowa: ±10%
+                        </div> -->
+                        <div class="data_right">
+                            Data: ${formattedDate}
+                        </div>
+                    </div>
+                `;
+                
+                stickersContainer.appendChild(stickerElement);
+            });
+        });
+
+        // Очищаем данные из localStorage после генерации наклеек
+        localStorage.removeItem('stickerData');
+    });
+    </script>
+</body>
+</html>

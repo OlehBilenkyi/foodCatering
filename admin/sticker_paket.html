@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/assets/stylescss/styles_paket.css" />
+    <title>Etykiety Menu na Opakowania</title>
+</head>
+<body>
+    <div class="container" id="sticker-container">
+        <!-- Здесь будут генерироваться наклейки -->
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Получаем данные из localStorage
+            const packageStickerDataJSON = localStorage.getItem('packageStickerData');
+            if (!packageStickerDataJSON) {
+                alert('Нет данных для генерации наклеек.');
+                console.error('packageStickerData отсутствует в localStorage');
+                window.location.href = "/admin/orders_summary.php";
+                return;
+            }
+
+            const packageStickerData = JSON.parse(packageStickerDataJSON);
+            const container = document.getElementById('sticker-container');
+
+            if (!packageStickerData || !packageStickerData.packages || packageStickerData.packages.length === 0) {
+                alert('Нет данных для генерации наклеек.');
+                console.error('packageStickerData.packages отсутствует или пуст');
+                window.location.href = "/admin/orders_summary.php";
+                return;
+            }
+
+            // Сортировка наклеек по калорийности
+            packageStickerData.packages.sort((a, b) => {
+                return parseInt(a.package_type) - parseInt(b.package_type);
+            });
+
+            // Генерация наклеек
+            packageStickerData.packages.forEach((packageInfo) => {
+                const stickerElement = document.createElement('div');
+                stickerElement.classList.add('sticker-paket');
+
+                // Форматирование адреса
+                const address = packageInfo.address || "Не указан адрес";
+                stickerElement.innerHTML = `
+                    <div class="sticker-paket-header">
+                        <h1 class="title-text">Menu: Standardowe ${packageInfo.package_type} kalorii</h1>
+                        <img class="logo-image" src="/assets/img/sticker_container.png" alt="Logo" />
+                    </div>
+                    <div class="sticker-paket-info">
+                        <div class="info-block">
+                            <span class="info-label">Adres:</span>
+                            <span class="info-value">${address}</span>
+                        </div>
+                        <div class="info-block">
+                            <span class="info-label">Data:</span>
+                            <span class="info-value">${packageStickerData.delivery_date}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(stickerElement);
+            });
+
+            console.log("Генерация наклеек завершена. Всего наклеек:", packageStickerData.packages.length);
+        });
+    </script>
+</body>
+</html>
