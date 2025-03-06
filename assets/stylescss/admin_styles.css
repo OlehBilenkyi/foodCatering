@@ -1,0 +1,1289 @@
+/* Основной контейнер для страницы входа */
+/***********************************************************************************************************************************/
+/* Основные стили для контейнера входа */
+.admin-login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Заголовок для страницы входа */
+.admin-login-container h2 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Форма входа */
+.admin-login-form {
+    width: 100%;
+}
+
+/* Поля ввода в форме */
+.admin-login-form .form-group {
+    margin-bottom: 15px;
+}
+
+.admin-login-form input[type="text"],
+.admin-login-form input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+/* Эффект при фокусе на поле ввода */
+.admin-login-form input[type="text"]:focus,
+.admin-login-form input[type="password"]:focus {
+    border-color: #2c3e50;
+    outline: none;
+}
+
+/* Кнопка входа */
+.admin-login-form button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Эффект при наведении на кнопку входа */
+.admin-login-form button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* Эффект при нажатии на кнопку входа */
+.admin-login-form button:active {
+    background-color: #1f6391;
+    transform: translateY(0px);
+}
+
+/* Адаптивные стили для планшетов (ширина менее 768px) */
+@media (max-width: 768px) {
+    .admin-login-container {
+        max-width: 90%;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .admin-login-form input[type="text"],
+    .admin-login-form input[type="password"] {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .admin-login-form button {
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+
+    .admin-login-container h2 {
+        font-size: 1.6rem;
+    }
+}
+
+/* Адаптивные стили для мобильных устройств (ширина менее 480px) */
+@media (max-width: 480px) {
+    .admin-login-container {
+        max-width: 95%;
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    .admin-login-container h2 {
+        font-size: 1.5rem;
+    }
+
+    .admin-login-form input[type="text"],
+    .admin-login-form input[type="password"] {
+        font-size: 0.8rem;
+        padding: 6px;
+    }
+
+    .admin-login-form button {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+}
+
+/* Дополнительные улучшения для маленьких экранов */
+@media (max-width: 360px) {
+    .admin-login-container {
+        padding: 10px;
+    }
+
+    .admin-login-form button {
+        font-size: 0.75rem;
+        padding: 7px;
+    }
+
+    .admin-login-container h2 {
+        font-size: 1.4rem;
+    }
+
+    .admin-login-form input[type="text"],
+    .admin-login-form input[type="password"] {
+        padding: 5px;
+        font-size: 0.75rem;
+    }
+}
+
+/***********************************************************************************************************************************/
+/* Основные стили для панели администратора */
+.admin-panel-container {
+    max-width: 800px;
+    margin: 80px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Заголовок для панели администратора */
+.admin-panel-header {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+/* Контейнер для кнопок админ-панели */
+.admin-panel-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Кнопки управления */
+.btn-admin {
+    width: 220px;
+    padding: 15px;
+    font-size: 1.1em;
+    text-align: center;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-block;
+}
+
+/* Стандартные стили для каждой кнопки в зависимости от её функции */
+.btn-primary {
+    background-color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-secondary {
+    background-color: #8e44ad;
+}
+
+.btn-secondary:hover {
+    background-color: #732d91;
+}
+
+.btn-success {
+    background-color: #27ae60;
+}
+
+.btn-success:hover {
+    background-color: #1e8449;
+}
+
+.btn-info {
+    background-color: #3498db;
+}
+
+.btn-info:hover {
+    background-color: #2980b9;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+/* Адаптивные стили для планшетов (ширина менее 768px) */
+@media (max-width: 768px) {
+    .admin-panel-container {
+        width: 90%;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    .admin-panel-header {
+        font-size: 1.8rem;
+    }
+
+    .btn-admin {
+        width: 48%; /* Кнопки займут половину ширины для удобства расположения в две колонки */
+        font-size: 1rem;
+        padding: 12px;
+    }
+}
+
+/* Адаптивные стили для мобильных устройств (ширина менее 480px) */
+@media (max-width: 480px) {
+    .admin-panel-container {
+        width: 95%;
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    .admin-panel-header {
+        font-size: 1.5rem;
+    }
+
+    .btn-admin {
+        width: 100%; /* Кнопки занимают всю ширину для удобства на узких экранах */
+        font-size: 0.9rem;
+        padding: 10px;
+    }
+}
+
+/* Дополнительные улучшения для маленьких экранов (ширина менее 360px) */
+@media (max-width: 360px) {
+    .admin-panel-container {
+        padding: 10px;
+    }
+
+    .admin-panel-header {
+        font-size: 1.4rem;
+    }
+
+    .btn-admin {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+}
+
+/*************************************************************************************************************************************/
+/* Основные стили для страницы управления ценами */
+.admin-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Заголовок страницы */
+.admin-container h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* Таблица для отображения и редактирования цен */
+.price-table {
+    width: 100%;
+    margin: 30px 0;
+    border-collapse: collapse;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.price-table th, .price-table td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.price-table thead {
+    background-color: #f7f7f7;
+}
+
+.price-table th {
+    background-color: #3498db;
+    color: white;
+    font-weight: bold;
+}
+
+.price-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.price-table tbody tr:hover {
+    background-color: #e9f5ff;
+}
+
+/* Кнопка для обновления цены */
+.btn-update {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-update:hover {
+    background-color: #1e8449;
+}
+
+.price-table input[type="number"] {
+    padding: 5px;
+    font-size: 1rem;
+    width: 80px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Кнопка для возврата в админ-панель */
+.btn-return {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 12px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-return:hover {
+    background-color: #2980b9;
+}
+
+/* Кнопка удаления цены */
+.btn-delete {
+    background-color: #dc3545; /* красный цвет для удаления */
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.btn-delete:hover {
+    background-color: #c9302c; /* Более насыщенный цвет при наведении */
+}
+
+/* Форма добавления новой цены */
+.add-price-form {
+    background-color: #ffffff; /* Белый фон */
+    padding: 20px; /* Отступ внутри формы */
+    margin: 20px 0; /* Отступ сверху и снизу формы */
+    border-radius: 10px; /* Округлённые углы */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Тень */
+}
+
+.add-price-form h3 {
+    text-align: center; /* Центрирование заголовка */
+    font-weight: bold; /* Полужирный шрифт */
+    margin-bottom: 20px; /* Отступ снизу заголовка */
+}
+
+.add-price-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px; /* Отступ снизу у каждого элемента формы */
+}
+
+.add-price-form label {
+    font-weight: bold; /* Полужирный шрифт для меток */
+    margin-bottom: 5px; /* Отступ снизу метки */
+}
+
+.add-price-form input[type="text"],
+.add-price-form input[type="number"] {
+    padding: 10px; /* Внутренний отступ у полей */
+    border: 1px solid #ccc; /* Серые границы */
+    border-radius: 5px; /* Округлённые углы */
+    box-sizing: border-box;
+    transition: border-color 0.3s; /* Плавное изменение цвета границы */
+}
+
+.add-price-form input[type="text"]:focus,
+.add-price-form input[type="number"]:focus {
+    border-color: #007bff; /* Синий цвет при фокусе */
+    outline: none; /* Убираем стандартное выделение браузера */
+}
+
+.add-price-form .btn-add {
+    background-color: #28a745; /* Зелёный фон кнопки */
+    color: white; /* Белый цвет текста */
+    padding: 10px 20px; /* Внутренние отступы у кнопки */
+    border: none; /* Убираем границы */
+    border-radius: 5px; /* Округлённые углы */
+    cursor: pointer; /* Указатель в виде руки */
+    font-size: 1em; /* Размер шрифта */
+    transition: background-color 0.3s; /* Плавное изменение цвета фона */
+}
+
+.add-price-form .btn-add:hover {
+    background-color: #218838; /* Более тёмный зелёный при наведении */
+}
+
+/* Адаптивные стили для планшетов (ширина менее 768px) */
+@media (max-width: 768px) {
+    .admin-container {
+        width: 95%;
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    .admin-container h1 {
+        font-size: 2rem;
+    }
+
+    .price-table th, .price-table td {
+        padding: 10px 8px;
+        font-size: 0.9rem;
+    }
+
+    .btn-update {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+
+    .btn-return {
+        font-size: 1rem;
+        padding: 10px 18px;
+    }
+
+    .add-price-form {
+        padding: 15px; /* Уменьшенный отступ на планшетах */
+    }
+
+    .add-price-form h3 {
+        font-size: 1.5em; /* Размер заголовка на планшетах */
+    }
+
+    .add-price-form .btn-add {
+        width: 100%; /* Кнопка занимает всю ширину */
+    }
+}
+
+/* Адаптивные стили для мобильных устройств (ширина менее 480px) */
+@media (max-width: 480px) {
+    .admin-container {
+        width: 98%;
+        margin: 20px auto;
+        padding: 10px;
+    }
+
+    .admin-container h1 {
+        font-size: 1.8rem;
+    }
+
+    .price-table {
+        font-size: 0.85rem;
+    }
+
+    .btn-update {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+
+    .btn-return {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+
+    .add-price-form {
+        padding: 10px;
+    }
+
+    .add-price-form h3 {
+        font-size: 1.2em; /* Меньший заголовок на мобильных */
+    }
+
+    .add-price-form .btn-add {
+        font-size: 0.85rem; /* Уменьшенный шрифт для удобства */
+        padding: 8px 15px; /* Уменьшенные отступы */
+    }
+}
+
+
+/**********************************************************************/
+/* Основные стили для админки */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Заголовки страниц */
+h1, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Формы */
+.form-group label {
+    font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Таблица */
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+.price-table th, .price-table td {
+    border: 1px solid #dee2e6;
+    padding: 10px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.price-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.price-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Кнопки */
+.btn-update {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-update:hover {
+    background-color: #218838;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #c82333;
+}
+
+.btn-return {
+    display: inline-block;
+    margin: 20px auto;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 4px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-return:hover {
+    background-color: #0056b3;
+}
+
+/* Адаптивные стили */
+
+/* Адаптивные стили для планшетов (ширина менее 768px) */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 15px;
+    }
+
+    .price-table {
+        font-size: 0.9em; /* Уменьшаем размер шрифта в таблице */
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+        padding: 8px; /* Уменьшаем внутренний отступ у полей ввода */
+    }
+
+    .btn-update,
+    .btn-delete {
+        padding: 4px 8px; /* Уменьшаем отступы у кнопок */
+        font-size: 0.9em; /* Уменьшаем размер шрифта кнопок */
+    }
+
+    .btn-return {
+        padding: 8px 15px; /* Уменьшаем отступы у кнопки возврата */
+        font-size: 1em;
+    }
+}
+
+/* Адаптивные стили для мобильных устройств (ширина менее 576px) */
+@media (max-width: 576px) {
+    .admin-container {
+        padding: 10px; /* Уменьшение отступов у контейнера */
+    }
+
+    .price-table th,
+    .price-table td {
+        padding: 8px; /* Уменьшение отступов в таблице */
+    }
+
+    h1, h3 {
+        font-size: 1.5em; /* Уменьшение размеров заголовков */
+    }
+
+    .btn-update,
+    .btn-delete {
+        width: 100%; /* Кнопки занимают всю ширину контейнера */
+        margin-bottom: 10px; /* Добавление отступов между кнопками */
+    }
+
+    .btn-return {
+        width: 100%; /* Кнопка возврата также занимает всю ширину */
+        padding: 8px 0;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group textarea {
+        padding: 6px; /* Еще больше уменьшаем внутренний отступ у полей */
+    }
+}
+
+/***************************************************************************************/
+/* Основные стили карточек блюд */
+.card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-body .form-group {
+    margin-bottom: 15px;
+}
+
+/* Сообщения об успехе и ошибках */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-dismissible .close {
+    position: relative;
+    top: -2px;
+    right: -10px;
+    color: inherit;
+}
+
+.alert-dismissible .close:hover {
+    color: #000;
+}
+
+/* Стили для таблицы блюд */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th, .table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.table .thead-dark th {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Стили для изображений блюд в таблице */
+.dish-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Стили для кнопок */
+.btn {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #fff;
+    display: inline-block;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+/* Адаптивность для планшетов и мобильных устройств */
+@media screen and (max-width: 768px) {
+    /* Снижаем размер изображений блюд и добавляем более компактные таблицы */
+    .dish-img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Переход на мобильные размеры таблиц */
+    .table th, .table td {
+        padding: 8px;
+        font-size: 0.9rem;
+    }
+
+    .admin-container {
+        padding: 15px;
+    }
+
+    /* Кнопки становятся компактнее */
+    .btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Адаптивность для мобильных устройств с шириной менее 576px */
+@media screen and (max-width: 576px) {
+    .card {
+        margin-bottom: 15px; /* Уменьшаем отступ между карточками на мобильных */
+    }
+
+    .card-header {
+        padding: 10px; /* Уменьшаем отступы внутри заголовка карточки */
+        font-size: 1rem; /* Размер шрифта уменьшается для мобильных */
+    }
+
+    .card-body {
+        padding: 15px; /* Уменьшаем внутренний отступ в теле карточки */
+    }
+
+    /* Поля ввода в карточках становятся более компактными */
+    .card-body .form-group input,
+    .card-body .form-group textarea {
+        padding: 8px;
+        font-size: 0.85rem;
+    }
+
+    /* Сокращаем отступы в таблице для мобильных устройств */
+    .table th, .table td {
+        padding: 6px;
+        font-size: 0.8rem;
+    }
+
+    /* Размер изображений уменьшается для более компактного отображения */
+    .dish-img {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Кнопки становятся еще компактнее */
+    .btn {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+
+    /* Объединение таблицы в более мобильный вид */
+    .compact-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Кнопки в виде целого блока на мобильных */
+    .btn-block {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+
+/* Основные стили для сетки карточек блюд и кнопок */
+/* Основные стили контейнеров для блюд и кнопок */
+.dish-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Сетка для кнопок в два ряда */
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.button-item {
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+/* Стили для различных кнопок */
+.btn-warning {
+    background-color: #f0ad4e;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #ec971f;
+}
+
+.btn-info {
+    background-color: #5bc0de;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #31b0d5;
+}
+
+.btn-danger {
+    background-color: #d9534f;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c9302c;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.chart-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+/* Медиа-запросы для адаптации под разные устройства */
+
+/* Планшеты (макс. ширина 768px) */
+@media (max-width: 768px) {
+    .dish-container {
+        grid-template-columns: 1fr; /* Переход к одной колонке для лучшей читабельности */
+        gap: 15px; /* Снижаем расстояние между карточками для компактного отображения */
+    }
+
+    .button-container {
+        grid-template-columns: 1fr 1fr; /* Сохраняем две колонки для кнопок */
+        gap: 15px; /* Уменьшаем промежутки между кнопками */
+        justify-content: center;
+    }
+
+    .button-item {
+        padding: 10px 20px; /* Уменьшаем отступы у кнопок для более компактного вида */
+        font-size: 14px; /* Уменьшаем размер текста для удобства просмотра на планшетах */
+    }
+
+    .chart-container {
+        margin: 15px auto;
+        padding: 0 10px; /* Добавляем отступы для графиков на планшетах */
+    }
+}
+
+/* Мобильные устройства (макс. ширина 480px) */
+@media (max-width: 480px) {
+    .dish-container {
+        grid-template-columns: 1fr; /* Переход к одной колонке на мобильном экране */
+        gap: 10px; /* Уменьшаем промежутки для более компактного вида */
+    }
+
+    .button-container {
+        grid-template-columns: 1fr; /* Одна колонка для всех кнопок */
+        gap: 10px; /* Уменьшаем промежутки между кнопками */
+        justify-content: center;
+    }
+
+    .button-item {
+        width: 100%; /* Кнопки занимают всю ширину контейнера для лучшего UX на мобильных */
+        padding: 12px; /* Увеличиваем вертикальные отступы для удобного нажатия пальцем */
+        font-size: 14px; /* Оптимальный размер текста для мобильных устройств */
+    }
+
+    .chart-container {
+        margin: 10px auto;
+        width: 90%; /* Уменьшаем ширину графика, чтобы уместить его на экране */
+        max-width: 100%; /* Убираем ограничения на ширину */
+    }
+}
+
+/* Дополнительная адаптивность для более узких мобильных устройств (макс. ширина 360px) */
+@media (max-width: 360px) {
+    .button-item {
+        font-size: 12px; /* Еще больше уменьшаем текст для сверхкомпактных экранов */
+        padding: 10px; /* Уменьшаем отступы для удобства */
+    }
+
+    .chart-container {
+        width: 95%; /* Увеличиваем покрытие экрана для графиков на узких мобильных устройствах */
+    }
+
+    .dish-container {
+        gap: 8px; /* Минимизируем отступы между карточками блюд для компактности */
+    }
+}
+
+/*******************************************************************************************************/
+/* Основные стили */
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+.admin-panel-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-panel-header {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.5em;
+    color: #007bff;
+}
+
+.admin-panel-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.btn-admin {
+    width: 200px;
+    font-size: 1.1em;
+    padding: 10px 15px;
+    border: none;
+    background-color: #007bff;
+    color: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+}
+
+.btn-admin:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Добавляем эффект легкого подъема при наведении */
+}
+
+/* Медиа-запросы для адаптации под разные устройства */
+
+/* Планшеты (макс. ширина 768px) */
+@media (max-width: 768px) {
+    .admin-panel-container {
+        margin: 30px auto;
+        padding: 20px;
+    }
+
+    .admin-panel-header {
+        font-size: 1.3em;
+    }
+
+    .btn-admin {
+        width: 180px; /* Уменьшаем ширину кнопок для лучшего просмотра на планшетах */
+        font-size: 1em;
+        padding: 8px 12px;
+    }
+
+    /* Более плотное выравнивание кнопок для планшетов */
+    .admin-panel-buttons {
+        gap: 15px;
+    }
+}
+
+/* Мобильные устройства (макс. ширина 480px) */
+@media (max-width: 480px) {
+    .admin-panel-container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    .admin-panel-header {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+    }
+
+    .admin-panel-buttons {
+        flex-direction: column; /* Размещаем кнопки в столбик для удобного нажатия пальцем */
+        gap: 15px;
+    }
+
+    .btn-admin {
+        width: 100%; /* Кнопки занимают всю ширину контейнера для удобного нажатия пальцем */
+        font-size: 1em;
+        padding: 10px;
+    }
+}
+
+/* Узкие экраны (макс. ширина 360px) */
+@media (max-width: 360px) {
+    .admin-panel-header {
+        font-size: 1.1em; /* Немного уменьшаем размер заголовка для небольших экранов */
+    }
+
+    .btn-admin {
+        font-size: 0.9em; /* Уменьшаем размер текста в кнопках */
+        padding: 8px; /* Уменьшаем внутренние отступы для кнопок */
+    }
+}
+
+/***********************************************************************************************/
+/* Основные стили для страницы */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #007bff;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.filters-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filter {
+    flex: 1;
+    min-width: 200px;
+}
+
+input[type="date"],
+input[type="text"],
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.btn-secondary {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.orders-table th,
+.orders-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.orders-table th {
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+}
+
+.orders-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.orders-table tr:hover {
+    background-color: #e2e6ea;
+}
+
+/* Адаптивные стили для планшетов и мобильных устройств */
+@media (max-width: 768px) {
+    .optional-column {
+        display: none;
+    }
+    .container {
+        padding: 15px;
+    }
+
+    .orders-table {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .orders-table {
+        font-size: 12px;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 8px;
+    }
+}

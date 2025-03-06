@@ -1,0 +1,148 @@
+/* Общие настройки для печати */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Arial", sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+@page {
+    size: 210mm 297mm; /* Размер A4 */
+    margin: 2mm; /* Минимальные отступы */
+}
+
+body {
+    margin: 0;
+}
+
+/* Сетка для размещения наклеек */
+.container {
+    width: 100%;
+    height: auto;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 70mm); /* Три колонки по 70 мм */
+    grid-auto-rows: 37mm; /* Фиксированная высота строки 37 мм */
+    gap: 0;
+    align-items: start;
+    justify-items: start;
+    overflow: hidden;
+    align-content: stretch;
+}
+
+/* Стили для стикеров на судочки */
+.sticker {
+    background-color: #fff;
+    width: 64mm;
+    height: 37mm;
+    padding: 2.5mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding-right: 10px;
+    padding-left: 10px;
+    overflow: hidden;
+    page-break-inside: avoid;
+    word-wrap: break-word;
+    font-size: 8px;
+    line-height: 1.2;
+}
+
+.sticker .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+
+.sticker .title__text {
+    font-size: 9px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Стили для стикеров на пакеты */
+.sticker-paket {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    background-color: #ffffff;
+    width: 64mm;
+    height: 37mm;
+    padding: 2mm;
+    font-size: 9px;
+    line-height: 1.2;
+    overflow: hidden;
+    word-wrap: break-word;
+    page-break-inside: avoid;
+}
+
+.sticker-paket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0px;
+}
+
+.sticker-paket-header .title-text {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.sticker-paket-header .logo-image {
+    width: 50px;
+    height: auto;
+}
+
+.sticker-paket-info {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 0px;
+}
+
+.sticker-paket-info .info-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #000; /* Рамка вокруг адреса и даты */
+    padding: 1.5px 1.5px;
+    margin-bottom: 1px;
+}
+
+.sticker-paket-info .info-block:last-child {
+    margin-bottom: 0; /* Убираем последний отступ */
+}
+
+.sticker-paket-info .info-label {
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.sticker-paket-info .info-value {
+    font-size: 15px;
+    text-align: right;
+    flex-grow: 1;
+    padding-left: 5mm;
+}
+
+/* Адаптация для печати */
+@media print {
+    .container {
+        page-break-inside: avoid;
+    }
+    .sticker,
+    .sticker-paket {
+        page-break-inside: avoid;
+    }
+}
