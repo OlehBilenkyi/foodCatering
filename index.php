@@ -112,7 +112,7 @@ for ($week = 0; $week < 4; $week++) {
     }
 }
 
-// Проверка наличия CSRF токена
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
         // Логирование неудачной проверки CSRF
