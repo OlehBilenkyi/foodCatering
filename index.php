@@ -103,7 +103,7 @@ for ($i = 0; $i < 4; $i++) {
     ];
 }
 
-// Генерация дат для каждого дня недели, начиная с текущей даты
+// Генераци
 $days = [];
 for ($week = 0; $week < 4; $week++) {
     $weekStartDate = new DateTime($weekDates[$week]['start']);
