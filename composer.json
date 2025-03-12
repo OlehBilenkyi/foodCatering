@@ -1,0 +1,9 @@
+{
+    
+    "require": {
+        "phpmailer/phpmailer": "^6.9",
+        "vlucas/phpdotenv": "^5.6",
+        "stripe/stripe-php": "^16.1"
+    },
+    "license": "proprietary"
+}

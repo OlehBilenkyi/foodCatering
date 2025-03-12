@@ -1,0 +1,87 @@
+# Перенаправление всех HTTP-запросов на HTTPS
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Запрет на доступ к файлу .env
+<Files .env>
+    Require all denied
+</Files>
+
+# Настройки кэширования для статических файлов
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-ttf "access plus 1 year"
+    ExpiresByType application/font-otf "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Кэширование статических файлов на 1 год
+    <FilesMatch "\.(js|css|jpg|jpeg|png|gif|svg|webp|woff|woff2|ttf|otf|ico)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+
+    # Content Security Policy
+    Header set Content-Security-Policy "
+    default-src 'self'; 
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/ https://connect.facebook.net https://unpkg.com; 
+    frame-src 'self' https://www.google.com/recaptcha/ https://js.stripe.com https://checkout.stripe.com; 
+    connect-src 'self' https://api.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; 
+    img-src 'self' data: https://www.gstatic.com https://www.google.com https://www.foodcasecatering.net https://www.facebook.com; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://unpkg.com; 
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+    img-src 'self' data: https://www.gstatic.com https://www.google.com;
+    "
+    
+    # Разрешаем все источники для CORS
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "X-Requested-With, X-CSRF-Token, Content-Type, Origin, Authorization, Accept"
+
+    # Разрешение CORS для шрифтов
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|svg)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Headers "Range"
+        Header set Access-Control-Expose-Headers "Accept-Ranges, Content-Encoding, Content-Length, Content-Range"
+    </FilesMatch>
+</IfModule>
+
+# Добавление MIME-типа для TTF, OTF и favicon (.ico) файлов
+<IfModule mod_mime.c>
+    AddType application/font-ttf .ttf
+    AddType application/font-otf .otf
+    AddType image/x-icon .ico
+</IfModule>
+
+# 🔥 Настройка маршрутов для авторизации
+RewriteRule ^auth/login$ users/login.php [L]
+RewriteRule ^auth/register$ users/register.php [L]
+RewriteRule ^auth/logout$ users/logout.php [L]
+RewriteRule ^dashboard$ users/dashboard.php [L]
+RewriteRule ^orders/([0-9]+)$ users/order_details.php?order_id=$1 [L]
+RewriteRule ^orders/repeat$ users/repeat_order.php [L]
+RewriteRule ^orders/cancel$ users/cancel_order.php [L]
+RewriteRule ^orders/history$ users/order_history.php [L]
+RewriteRule ^orders/history$ users/orders.php [L]
+
+# Включение отображения ошибок PHP (только для разработки)
+php_flag display_errors on
+php_flag display_startup_errors on
+php_value error_reporting -1
+
+# Оптимизация серверного времени ожидания
+Timeout 600
+KeepAlive On
+MaxKeepAliveRequests 100
+KeepAliveTimeout 5

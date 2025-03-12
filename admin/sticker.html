@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Generowanie Naklejek</title>
+    <link rel="stylesheet" href="/assets/stylescss/sticker.css" />
+    <style>
+        @media print {
+            .container {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .sticker {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="stickers-container"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            const stickerDataJSON = localStorage.getItem('stickerData');
+            if (!stickerDataJSON) throw new Error("Нет данных в localStorage");
+
+            const response = JSON.parse(stickerDataJSON);
+            console.log("Загруженные данные:", response);
+
+            if (!response || !response.packages || response.packages.length === 0) {
+                throw new Error("Некорректные или пустые данные");
+            }
+
+            const formattedDate = response.delivery_date ? response.delivery_date.split('-').reverse().join('-') : "Brak daty";
+            const packageOrder = ['Ś', 'O', 'P', 'K'];
+            response.packages.sort((a, b) => packageOrder.indexOf(a.package[0]) - packageOrder.indexOf(b.package[0]));
+
+            const stickersContainer = document.getElementById('stickers-container');
+            stickersContainer.innerHTML = ''; 
+
+            response.packages.forEach((packageInfo) => {
+                const packageLabel = packageInfo.package;
+                packageInfo.dishes.forEach((dish) => {
+                    const stickerElement = document.createElement('div');
+                    stickerElement.classList.add('sticker');
+
+                    stickerElement.innerHTML = `
+                        <div class="title">
+                            <h1 class="title__text">${dish.description}</h1>
+                            <div class="callorii">${packageLabel}</div>
+                        </div>
+                        <div class="composition">
+                            <div class="composition__text">
+                                <div class="ingredients"><strong>Składniki:</strong> ${dish.ingredients || 'Brak'}</div>
+                                <div class="allergens"><strong>Alergeny:</strong> ${dish.allergens || 'Brak informacji'}</div>
+                            </div>
+                            <div><img src="/assets/img/sticker.png" alt="img" class="img" /></div>
+                        </div>
+                        <div class="desc">
+                            <h2 class="desc__title">Wartość odżywcza w porcji:</h2>
+                            <div class="portion">
+                                <div class="energy">Energia: <strong>${parseFloat(dish.energy || 0).toFixed(2)}</strong> kcal</div>
+                                <div class="fat">Tłuszcz: <strong>${parseFloat(dish.fat || 0).toFixed(2)}</strong> g</div>
+                                <div class="carbohydrates">Węglowodany: <strong>${parseFloat(dish.carbohydrates || 0).toFixed(2)}</strong> g</div>
+                                <div class="protein">Białko: <strong>${parseFloat(dish.protein || 0).toFixed(2)}</strong> g</div>
+                                <div class="sol">Sól: <strong>${parseFloat(dish.salt || 0).toFixed(2)}</strong> g</div>
+                            </div>
+                            <div class="desc__dowm">Wartość odżywcza jest przybliżona i może się różnić.</div>
+                        </div>
+                        <div class="footer">
+                            <div class="footer__text">Przechowywać w temperaturze od 0°C do 8°C. Po otrzymaniu spożyć w ciągu 24 godzin.</div>
+                        </div>
+                        <div class="net_mass_container">
+                            <div class="data_right">Data: ${formattedDate}</div>
+                        </div>
+                    `;
+
+                    stickersContainer.appendChild(stickerElement);
+                });
+            });
+
+            console.log(`Стикеров сгенерировано: ${response.packages.length}`);
+
+            // Автоматическая печать
+            setTimeout(() => window.print(), 1000);
+
+            // Очищение localStorage после печати
+            window.onafterprint = function () {
+                localStorage.removeItem('stickerData');
+                window.close(); // Закрыть окно после печати
+            };
+        } catch (error) {
+            console.error("Ошибка при загрузке данных:", error.message);
+            alert("Brak danych do generowania.");
+            window.close();
+        }
+    });
+    </script>
+</body>
+</html>
