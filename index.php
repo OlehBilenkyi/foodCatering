@@ -118,7 +118,7 @@ Nasze opakowanie nie szkodzi nature.
 <div class=menu__nav>
 <?php foreach ($weekDates as $index => $date): ?>
 <div class="menu__nav-item <?= $index === 0 ? 'active' : '' ?>" data-week="<?= $index + 1 ?>">
-<?php $startDate=new DateTime($date['start']);$endDate=new DateTime($date['end']);$startFormatted=$startDate->format('d.m');$endFormatted=$endDate->format('d.m'); ?>Tydzień<?=$index+1?><?=$startFormatted?>-<?=$endFormatted?>
+<?php $startDate=new DateTime($date['start']);$endDate=new DateTime($date['end']);$startFormatted=$startDate->format('d.m');$endFormatted=$endDate->format('d.m'); ?>Tydzień - <?=$startFormatted?>-<?=$endFormatted?>
 </div>
 <?php endforeach; ?>
 </div>

@@ -14,7 +14,3 @@ vendor/
 # System files
 .DS_Store
 Thumbs.db
-
-.htaccess
-
-.well-known
