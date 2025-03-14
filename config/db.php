@@ -1,71 +1,76 @@
 <?php
-// Включаем автозагрузку библиотек через Composer
 require_once $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+
+use Dotenv\Dotenv;
+use Symfony\Component\Dotenv\Dotenv as SymfonyDotenv;
 
 // Включаем логирование ошибок ДО запуска сессии
 ini_set('log_errors', 1);
 ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/logs/error_log.log');
-error_reporting(E_ALL); // Логируем все ошибки для тщательной диагностики
+error_reporting(E_ALL);
 
-// Устанавливаем увеличенное время жизни сессии до 4 часов (ДО запуска сессии)
+// Увеличиваем время жизни сессии до 4 часов
 if (session_status() == PHP_SESSION_NONE) {
-    ini_set('session.gc_maxlifetime', 14400); // Только если сессия не активна
-    session_start(); // Запуск сессии, если она еще не была запущена
+    ini_set('session.gc_maxlifetime', 14400);
+    session_start();
 }
 
-use Dotenv\Dotenv;
-
-// Проверяем наличие файла .env
+// Проверяем, есть ли файл .env
 if (!file_exists($_SERVER['DOCUMENT_ROOT'] . '/.env')) {
-    error_log("Файл .env не найден.");
-    die('Произошла внутренняя ошибка сервера. Пожалуйста, обратитесь в службу поддержки.');
+    error_log("❌ Файл .env не найден.");
+    die('Произошла ошибка сервера. Обратитесь в поддержку.');
 }
 
-// Загружаем переменные окружения из файла .env
+// Загружаем переменные окружения
 $dotenv = Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT']);
 $dotenv->load();
 
 // Проверяем режим отладки
-$debugMode = $_ENV['DEBUG_MODE'] ?? 'false';
+$debugMode = filter_var($_ENV['DEBUG_MODE'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
-// Параметры подключения к базе данных через переменные окружения
-$host = $_ENV['DB_HOST'] ?? 'localhost';
-$db = $_ENV['DB_NAME'] ?? 'u100222829_foodcasecateri';
-$user = $_ENV['DB_USER'] ?? 'u100222829_fc';
-$pass = $_ENV['DB_PASSWORD'] ?? 'S_hevcenka1993';
-$charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+// Функция безопасного получения переменной окружения
+function getEnvVar(string $key): string {
+    if (empty($_ENV[$key])) {
+        error_log("⚠️ Отсутствует переменная окружения: $key");
+        throw new Exception("Ошибка конфигурации.");
+    }
+    return $_ENV[$key];
+}
 
-// DSN (Data Source Name) для подключения к базе данных
+// Получаем данные для подключения
+$host    = getEnvVar('DB_HOST');
+$db      = getEnvVar('DB_NAME');
+$user    = getEnvVar('DB_USER');
+$pass    = getEnvVar('DB_PASSWORD');
+$charset = getEnvVar('DB_CHARSET');
+
+// Формируем DSN
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, // Включение режима обработки ошибок с выбросом исключений
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, // Установка режима выборки по умолчанию для ассоциативных массивов
-    PDO::ATTR_EMULATE_PREPARES => false, // Отключение эмуляции подготовленных выражений для повышения безопасности
-    PDO::ATTR_PERSISTENT => false // Отключение постоянного подключения для предотвращения превышения лимита соединений
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+    PDO::ATTR_PERSISTENT => false
 ];
 
 try {
-    // Подключение к базе данных
     $pdo = new PDO($dsn, $user, $pass, $options);
-    
-    // Логируем успешное подключение только в режиме отладки
-    if ($debugMode === 'true') {
-        error_log("Успешное подключение к базе данных для пользователя $user.");
+    $pdo->exec("SET NAMES 'utf8mb4'");
+
+    if ($debugMode) {
+        error_log("✅ Успешное подключение к БД ($db) пользователем $user.");
     }
-} catch (\PDOException $e) {
-    // Логирование ошибки и вывод понятного сообщения для пользователя
-    error_log("Ошибка подключения к базе данных: " . $e->getMessage());
+} catch (PDOException $e) {
+    error_log("❌ Ошибка БД: " . $e->getMessage());
     http_response_code(500);
 
-    // Проверяем существование файла error_page.php перед подключением
     $errorPagePath = $_SERVER['DOCUMENT_ROOT'] . '/includes/error_page.php';
     if (file_exists($errorPagePath)) {
-        include($errorPagePath); // Страница ошибки
+        include($errorPagePath);
     } else {
         echo '<h1>Произошла ошибка</h1>';
-        echo '<p>Мы не можем подключиться к базе данных в данный момент. Пожалуйста, попробуйте позже.</p>';
+        echo '<p>Сейчас невозможно подключиться к базе. Попробуйте позже.</p>';
     }
-    
     exit();
 }
 ?>

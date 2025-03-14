@@ -4,29 +4,29 @@ use Stripe\Stripe;
 
 // Настройки параметров куки для сессии
 session_set_cookie_params([
-    'lifetime' => 14400, // Устанавливаем время жизни куки на 4 часа
+    'lifetime' => 14400, // 4 часа
     'path' => '/',
     'domain' => $_SERVER['HTTP_HOST'],
-    'secure' => isset($_SERVER['HTTPS']), // Куки только для HTTPS
-    'httponly' => true, // Защита от XSS
-    'samesite' => 'None', // Для совместимости с мобильными устройствами
+    'secure' => isset($_SERVER['HTTPS']), 
+    'httponly' => true, 
+    'samesite' => 'None', 
 ]);
 
 session_start();
-session_regenerate_id(true); // Защита от фиксации сессий
+session_regenerate_id(true); 
 
-// Включаем логирование ошибок
+// Логирование ошибок
 ini_set('log_errors', 1);
 ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/logs/error_log.log');
 
 $dotenv = Dotenv\Dotenv::createImmutable($_SERVER['DOCUMENT_ROOT']);
 $dotenv->load();
 
-// Проверяем наличие session_id в запросе
+// Проверяем наличие session_id
 if (!isset($_GET['session_id'])) {
-    error_log("Ошибка: отсутствует идентификатор сессии Stripe.");
+    error_log("Ошибка: отсутствует session_id.");
     http_response_code(400);
-    exit("Отсутствует идентификатор сессии Stripe.");
+    exit("Ошибка: отсутствует session_id.");
 }
 
 $session_id = htmlspecialchars($_GET['session_id']);
@@ -41,34 +41,85 @@ if (!$stripeSecretKey) {
 
 Stripe::setApiKey($stripeSecretKey);
 
-// Проверка Stripe-сессии для отображения успеха пользователю
 try {
     $session = \Stripe\Checkout\Session::retrieve($session_id);
 
     if ($session->payment_status !== 'paid') {
-        error_log("Ошибка: сессия не оплачена.");
+        error_log("Ошибка: сессия $session_id не оплачена.");
         http_response_code(400);
         exit("Сессия не оплачена.");
     }
 
-    // Логирование успешной проверки Stripe-сессии
-    error_log("Сессия с ID $session_id успешно оплачена. Переход на страницу подтверждения оплаты.");
+    // Получаем order_id из метаданных Stripe
+    $orderId = $session->metadata->order_id ?? null;
+
+    if (!$orderId) {
+        error_log("Ошибка: order_id отсутствует в метаданных.");
+        http_response_code(400);
+        exit("Ошибка: отсутствует order_id.");
+    }
+
+    error_log("Проверяем заказ #$orderId в БД.");
+
+    // Подключение к БД
+    try {
+        $pdo = new PDO(
+            "mysql:host=" . $_ENV['DB_HOST'] . ";dbname=" . $_ENV['DB_NAME'] . ";charset=" . $_ENV['DB_CHARSET'],
+            $_ENV['DB_USER'],
+            $_ENV['DB_PASSWORD'],
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+        );
+    } catch (PDOException $e) {
+        error_log("Ошибка БД: " . $e->getMessage());
+        http_response_code(500);
+        exit();
+    }
+
+    // Проверяем заказ в `orders`
+    $stmt = $pdo->prepare("SELECT status FROM orders WHERE order_id = ?");
+    $stmt->execute([$orderId]);
+    $order = $stmt->fetch();
+
+    if ($order) {
+        if ($order['status'] !== 'оплачен') {
+            $stmt = $pdo->prepare("UPDATE orders SET status = 'оплачен' WHERE order_id = ?");
+            $stmt->execute([$orderId]);
+            error_log("✅ Статус заказа #$orderId обновлен в `orders`.");
+        }
+        $orderType = 'orders';
+    } else {
+        // Проверяем заказ в `customer_menu_orders`
+        $stmt = $pdo->prepare("SELECT status FROM customer_menu_orders WHERE order_id = ?");
+        $stmt->execute([$orderId]);
+        $menuOrder = $stmt->fetch();
+
+        if ($menuOrder) {
+            if ($menuOrder['status'] !== 'paid') {
+                $stmt = $pdo->prepare("UPDATE customer_menu_orders SET status = 'paid' WHERE order_id = ?");
+                $stmt->execute([$orderId]);
+                error_log("✅ Статус заказа #$orderId обновлен в `customer_menu_orders`.");
+            }
+            $orderType = 'customer_menu_orders';
+        } else {
+            error_log("Ошибка: заказ #$orderId не найден в БД.");
+            http_response_code(404);
+            exit("Ошибка: заказ не найден.");
+        }
+    }
 
     // Очистка данных о заказе из сессии
-    session_unset(); // Полностью очищаем данные сессии
+    session_unset();
     session_write_close();
 
 } catch (\Stripe\Exception\ApiErrorException $e) {
-    error_log("Ошибка при проверке Stripe-сессии: " . $e->getMessage());
+    error_log("Ошибка Stripe: " . $e->getMessage());
     http_response_code(500);
-    exit("Ошибка при проверке платежа.");
+    exit("Ошибка платежа.");
 } catch (Exception $e) {
     error_log("Общая ошибка: " . $e->getMessage());
     http_response_code(500);
-    exit("Произошла ошибка обработки вашего заказа.");
+    exit("Ошибка обработки заказа.");
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -82,6 +133,22 @@ try {
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="../assets/css/global.css">
   <link rel="icon" href="/assets/img/favicon.ico" type="image/x-icon">
+  
+  <style>
+      .info-block__actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .info-block__success{
+        display: flex;
+        gap: 10px;
+    }
+      
+  </style>
+  
 </head>
 <body>
   <?php  include $_SERVER['DOCUMENT_ROOT'] . '/includes/header.php';?>
@@ -100,7 +167,10 @@ try {
 
         <div class="info-block__actions">
           <a href="/" class="btn">Strona główna</a>
-          <a href="/index2" class="btn">Złóż zamówienie</a>
+          <div class="info-block__success">
+                <a href="/index2/" class="btn">Standardowe menu</a>
+                <a href="/menu_do_wyboru/" class="btn">Menu do wyboru</a>
+            </div>
         </div>
         
       </div>

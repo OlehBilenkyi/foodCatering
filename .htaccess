@@ -21,9 +21,9 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     ExpiresByType image/webp "access plus 1 year"
     ExpiresByType application/font-woff2 "access plus 1 year"
     ExpiresByType application/font-woff "access plus 1 year"
-    ExpiresByType application/font-ttf "access plus 1 year" # Добавлено для TTF шрифтов
-    ExpiresByType application/font-otf "access plus 1 year" # Добавлено для OTF шрифтов
-    ExpiresByType image/x-icon "access plus 1 year" # Добавлено для иконок favicon
+    ExpiresByType application/font-ttf "access plus 1 year"
+    ExpiresByType application/font-otf "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
 </IfModule>
 
 <IfModule mod_headers.c>
@@ -32,17 +32,18 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
         Header set Cache-Control "max-age=31536000, public"
     </FilesMatch>
 
-    # Обновленная версия Content Security Policy для разрешения всех необходимых скриптов и изображений
+    # Content Security Policy
     Header set Content-Security-Policy "
-        default-src 'self'; 
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/ https://connect.facebook.net; 
-        frame-src 'self' https://www.google.com/recaptcha/ https://js.stripe.com https://checkout.stripe.com; 
-        connect-src 'self' https://api.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; 
-        img-src 'self' data: https://www.gstatic.com https://www.google.com https://www.foodcasecatering.net https://www.facebook.com; 
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com; 
-        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+    default-src 'self'; 
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/ https://connect.facebook.net https://unpkg.com; 
+    frame-src 'self' https://www.google.com/recaptcha/ https://js.stripe.com https://checkout.stripe.com; 
+    connect-src 'self' https://api.stripe.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; 
+    img-src 'self' data: https://www.gstatic.com https://www.google.com https://www.foodcasecatering.net https://www.facebook.com; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com https://unpkg.com; 
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+    img-src 'self' data: https://www.gstatic.com https://www.google.com;
     "
-
+    
     # Разрешаем все источники для CORS
     Header set Access-Control-Allow-Origin "*"
     Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
@@ -60,8 +61,19 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 <IfModule mod_mime.c>
     AddType application/font-ttf .ttf
     AddType application/font-otf .otf
-    AddType image/x-icon .ico # Добавлено для иконок favicon
+    AddType image/x-icon .ico
 </IfModule>
+
+# 🔥 Настройка маршрутов для авторизации
+RewriteRule ^auth/login$ users/login.php [L]
+RewriteRule ^auth/register$ users/register.php [L]
+RewriteRule ^auth/logout$ users/logout.php [L]
+RewriteRule ^dashboard$ users/dashboard.php [L]
+RewriteRule ^orders/([0-9]+)$ users/order_details.php?order_id=$1 [L]
+RewriteRule ^orders/repeat$ users/repeat_order.php [L]
+RewriteRule ^orders/cancel$ users/cancel_order.php [L]
+RewriteRule ^orders/history$ users/order_history.php [L]
+RewriteRule ^orders/history$ users/orders.php [L]
 
 # Включение отображения ошибок PHP (только для разработки)
 php_flag display_errors on

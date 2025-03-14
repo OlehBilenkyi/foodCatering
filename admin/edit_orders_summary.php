@@ -65,6 +65,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['order_id'])) {
         body {
             font-family: Arial, sans-serif;
         }
+        .big-order-title{
+           font-size: 40px; 
+        }
         .form-container {
             max-width: 800px;
             margin: 0 auto;
@@ -74,34 +77,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['order_id'])) {
             background-color: #f9f9f9;
         }
         .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* Убедитесь, что контейнер занимает всю ширину */
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input, .form-group textarea, .form-group select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    width: 100%; /* Убедитесь, что поля ввода занимают всю ширину */
+    box-sizing: border-box; /* Включаем padding и border в общую ширину */
+}
         .form-group button {
-            padding: 10px 20px;
-            background-color: #1565c0;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            margin-top: 20px;
-        }
+    font-size: 18px;
+    width: 222px;
+    padding: 10px 20px;
+    background-color: #1565c0;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    margin:  10px 0;
+}
         .form-group button:hover {
             background-color: #003c8f;
         }
         .return-buttons {
-            margin-top: 20px;
+            margin: 20px 0;
             text-align: center;
         }
         .return-buttons a {
@@ -117,11 +131,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['order_id'])) {
         .return-buttons a:hover {
             background-color: #003c8f;
         }
+        
+        
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h2>Редагування замовлення #<?= htmlspecialchars($order['order_id']) ?></h2>
+        <div class="return-buttons">
+        <a href="/admin/orders_summary.php">Назад до Таблиці замовлень</a>
+        <a href="/admin/admin_panel.php">Повернутися в адмін-панель</a>
+    </div>
+        <h2 class="big-order-title">Редагування замовлення #<?= htmlspecialchars($order['order_id']) ?></h2>
         <form action="edit_orders_summary.php" method="POST">
             <input type="hidden" name="order_id" value="<?= htmlspecialchars($order['order_id']) ?>">
 
@@ -214,13 +234,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['order_id'])) {
             <div class="form-group">
                 <button type="submit">Зберегти зміни</button>
             </div>
-        </form>
-    </div>
-
-    <div class="return-buttons">
+            <div class="return-buttons">
         <a href="/admin/orders_summary.php">Назад до Таблиці замовлень</a>
         <a href="/admin/admin_panel.php">Повернутися в адмін-панель</a>
     </div>
+        </form>
+    </div>
+
+    
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

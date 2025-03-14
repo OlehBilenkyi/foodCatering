@@ -73,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->isHTML(true);
         $mail->Subject = $subject;
         $mail->Body = $messageBody;
-
+        $mail->CharSet = "UTF-8";
+        $mail->Encoding = "base64";
         $mail->send();
         echo json_encode(['success' => true, 'message' => 'Сообщение успешно отправлено. Спасибо за ваш отзыв!']);
     } catch (Exception $e) {

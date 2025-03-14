@@ -47,11 +47,19 @@ include $_SERVER['DOCUMENT_ROOT'] . '/includes/header.php'; // Подключа�
 <div class="admin-panel-container">
     <h2 class="admin-panel-header">Ласкаво просимо до Адмін Панелі</h2>
     <div class="admin-panel-buttons">
-        <a href="/admin/admin_price.php" class="btn btn-primary btn-admin">Управління цінами</a>
+        <div class="buttons-group">
         <a href="/admin/admin_menu.php" class="btn btn-primary btn-admin">Управління тижневим меню</a>
-        <a href="/admin/orders_summary.php" class="btn btn-primary">Таблиця замовлень</a> <!-- Новая кнопка -->
-        <a href="/admin/logout.php" class="btn btn-danger btn-admin">Вийти</a>
+        <a href="/admin/admin_price.php" class="btn btn-primary btn-admin">Управління цінами Меню Стандартне</a>
+         <a href="/admin/orders_summary.php" class="btn btn-primary btn-admin">Таблиця замовлень Меню Стандартне</a> <!-- Новая кнопка -->
+        </div>
+        
+        <div class="buttons-group">
+        <a href="/admin/edit_menu_do_wyboru.php" class="btn btn-primary btn-admin">Управління Меню до Вибору</a>
+       <a href="/admin/edit_prices_menu_do_wyboru.php" class="btn btn-primary btn-admin">Управління цінами  Меню до Вибору</a>
+        <a href="/admin/admin_orders_menu_do_wyboru.php" class="btn btn-primary btn-admin">Таблиця замовлень Меню до Вибору</a> <!-- Новая кнопка -->
+        </div>
     </div>
+    <a href="/admin/logout.php" class="btn btn-danger btn-admin">Вийти</a>
 </div>
 
 <!-- Графік відвідувань -->
@@ -390,71 +398,111 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
-    body {
-        font-family: Arial, sans-serif;
+
+@media (max-width: 1024px) {
+    .admin-panel-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .buttons-group {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
     }
 
     .form-group, .filter-group {
-        margin-bottom: 15px;
-        display: inline-block;
-        width: auto;
-        margin-right: 20px;
+        display: block;
+        width: 100%;
+        margin-right: 0;
+        text-align: center;
     }
 
     .pagination-buttons {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 10px 0;
+        flex-wrap: wrap;
+        gap: 5px;
     }
 
     .pagination-buttons button {
-        margin: 0 5px;
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        background-color: #f0f0f0;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .pagination-buttons button:hover {
-        background-color: #e0e0e0;
-    }
-
-    .pagination-buttons .current-page {
-        background-color: #007bff;
-        color: white;
+        padding: 8px 12px;
+        font-size: 14px;
     }
 
     table {
-        width: 100%;
-        border-collapse: collapse;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     table th, table td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: center;
-    }
-
-    table th {
-        cursor: pointer;
-    }
-
-    .sort-indicator {
-        margin-left: 5px;
-    }
-
-    .chart-pagination {
-        text-align: center;
-        margin-top: 10px;
+        padding: 8px;
     }
 
     .chart-pagination button {
-        margin: 5px;
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-panel-buttons {
+        gap: 10px;
     }
 
-</style>
+    .buttons-group {
+        width: 100%;
+    }
+
+    .pagination-buttons {
+        justify-content: center;
+    }
+
+    .pagination-buttons button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    table th, table td {
+        padding: 6px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-panel-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .pagination-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pagination-buttons button {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+
+    table th, table td {
+        padding: 5px;
+        font-size: 12px;
+    }
+
+    .chart-pagination {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .chart-pagination button {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+
+body{font-family:Arial,sans-serif}.admin-panel-buttons{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-bottom:15px}.buttons-group{display:flex;gap:15px}.buttons-group:first-of-type{border-bottom:2px solid #ddd;padding-bottom:20px;margin-bottom:0}.form-group,.filter-group{margin-bottom:15px;display:inline-block;width:auto;margin-right:20px}.pagination-buttons{display:flex;justify-content:center;align-items:center;margin:10px 0}.pagination-buttons button{margin:0 5px;padding:5px 10px;border:1px solid #ccc;background-color:#f0f0f0;cursor:pointer;transition:background-color 0.3s}.pagination-buttons button:hover{background-color:#e0e0e0}.pagination-buttons .current-page{background-color:#007bff;color:#fff}table{width:100%;border-collapse:collapse}table th,table td{padding:10px;border:1px solid #ddd;text-align:center}table th{cursor:pointer}.sort-indicator{margin-left:5px}.chart-pagination{text-align:center;margin-top:10px}.chart-pagination button{margin:5px}</style>
 
 </body>
 </html>

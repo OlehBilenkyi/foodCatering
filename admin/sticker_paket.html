@@ -12,60 +12,87 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Получаем данные из localStorage
-            const packageStickerDataJSON = localStorage.getItem('packageStickerData');
-            if (!packageStickerDataJSON) {
-                alert('Нет данных для генерации наклеек.');
-                console.error('packageStickerData отсутствует в localStorage');
-                window.location.href = "/admin/orders_summary.php";
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Получаем данные из localStorage
+                const packageStickerDataJSON = localStorage.getItem('packageStickerData');
+                if (!packageStickerDataJSON) throw new Error("❌ Нет данных в localStorage");
 
-            const packageStickerData = JSON.parse(packageStickerDataJSON);
-            const container = document.getElementById('sticker-container');
+                const packageStickerData = JSON.parse(packageStickerDataJSON);
+                if (!packageStickerData || !Array.isArray(packageStickerData.packages) || packageStickerData.packages.length === 0) {
+                    throw new Error("❌ Некорректные или пустые данные для наклеек");
+                }
 
-            if (!packageStickerData || !packageStickerData.packages || packageStickerData.packages.length === 0) {
-                alert('Нет данных для генерации наклеек.');
-                console.error('packageStickerData.packages отсутствует или пуст');
-                window.location.href = "/admin/orders_summary.php";
-                return;
-            }
+                const container = document.getElementById('sticker-container');
+                if (!container) throw new Error("❌ Контейнер для наклеек не найден");
 
-            // Сортировка наклеек по калорийности
-            packageStickerData.packages.sort((a, b) => {
-                return parseInt(a.package_type) - parseInt(b.package_type);
-            });
+                // Сортировка по типу пакета
+                packageStickerData.packages.sort((a, b) => (parseInt(a.package_type) || 0) - (parseInt(b.package_type) || 0));
 
-            // Генерация наклеек
-            packageStickerData.packages.forEach((packageInfo) => {
-                const stickerElement = document.createElement('div');
-                stickerElement.classList.add('sticker-paket');
+                // Генерация наклеек
+                packageStickerData.packages.forEach((packageInfo) => {
+                    const stickerElement = document.createElement('div');
+                    stickerElement.classList.add('sticker-paket');
 
-                // Форматирование адреса
-                const address = packageInfo.address || "Не указан адрес";
-                stickerElement.innerHTML = `
-                    <div class="sticker-paket-header">
-                        <h1 class="title-text">Menu: Standardowe ${packageInfo.package_type} kalorii</h1>
-                        <img class="logo-image" src="/assets/img/sticker_container.png" alt="Logo" />
-                    </div>
-                    <div class="sticker-paket-info">
-                        <div class="info-block">
-                            <span class="info-label">Adres:</span>
-                            <span class="info-value">${address}</span>
+                    // Динамический заголовок (поддержка разных типов меню)
+                    const menuTitle = `Menu: ${escapeHTML(packageInfo.menu_type || 'Standardowe')} ${escapeHTML(packageInfo.package_type)} kalorii`;
+
+                    // Форматирование адреса
+                    const address = packageInfo.address ? escapeHTML(packageInfo.address) : "Nie podano adresu";
+
+                    stickerElement.innerHTML = `
+                        <div class="sticker-paket-header">
+                            <h1 class="title-text">${menuTitle}</h1>
+                            <img class="logo-image" src="/assets/img/sticker_container.png" alt="Logo firmy" />
                         </div>
-                        <div class="info-block">
-                            <span class="info-label">Data:</span>
-                            <span class="info-value">${packageStickerData.delivery_date}</span>
+                        <div class="sticker-paket-info">
+                            <div class="info-block">
+                                <span class="info-label">Adres:</span>
+                                <span class="info-value">${address}</span>
+                            </div>
+                            <div class="info-block">
+                                <span class="info-label">Data:</span>
+                                <span class="info-value">${escapeHTML(packageStickerData.delivery_date)}</span>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
 
-                container.appendChild(stickerElement);
-            });
+                    container.appendChild(stickerElement);
+                });
 
-            console.log("Генерация наклеек завершена. Всего наклеек:", packageStickerData.packages.length);
+                console.log(`✅ Генерация наклеек завершена. Всего: ${packageStickerData.packages.length}`);
+
+                // Автоматически открыть окно печати после генерации
+                setTimeout(() => {
+                    window.print();
+                    setTimeout(() => {
+                        localStorage.removeItem('packageStickerData'); // Очищаем localStorage
+                        console.log("🗑️ Данные из localStorage удалены");
+
+                        // Проверяем, открыто ли окно в новой вкладке перед закрытием
+                        if (window.opener == null) {
+                            window.close();
+                        }
+                    }, 1000);
+                }, 500);
+
+            } catch (error) {
+                console.error("❌ Ошибка генерации наклеек:", error.message);
+                alert(error.message);
+                window.location.href = "/admin/orders_summary.php";
+            }
         });
+
+        // Функция для экранирования HTML (защита от XSS)
+        function escapeHTML(str) {
+            return String(str).replace(/[&<>"']/g, (match) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[match]));
+        }
     </script>
 </body>
 </html>

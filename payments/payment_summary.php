@@ -4,21 +4,20 @@
 require __DIR__ . '/../vendor/autoload.php';
 use Dotenv\Dotenv;
 use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 session_start([
     'cookie_lifetime' => 86400,
-    'cookie_secure' => true,
+    'cookie_secure'   => true,
     'cookie_httponly' => true,
     'cookie_samesite' => 'Lax',
 ]);
 
 error_log('====== Начало работы payment_summary.php ======');
-
-// Логируем идентификатор сессии и данные сессии на старте
 error_log('Сгенерирован новый идентификатор сессии: ' . session_id());
 error_log('Данные сессии на старте: ' . print_r($_SESSION, true));
 
-// Инициализируем загрузку переменных окружения
+// Инициализация переменных окружения
 $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 error_log('Загружены переменные окружения из .env');
@@ -34,14 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Логирование заголовков запроса для проверки
+// Логируем заголовки запроса
 $headers = getallheaders();
 error_log('Заголовки запроса: ' . print_r($headers, true));
 
-// Получаем входящие данные от клиента и проверяем корректность JSON
+// Получаем и декодируем входящие данные
 $rawInput = file_get_contents('php://input');
 error_log('Полученные сырые данные JSON: ' . $rawInput);
-
 $input = json_decode($rawInput, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     error_log('Ошибка разбора JSON: ' . json_last_error_msg());
@@ -61,19 +59,27 @@ if (!$stripeSecretKey) {
 }
 error_log('Секретный ключ Stripe успешно загружен');
 
-// Обработка исключений
 try {
+    // Устанавливаем API-ключ Stripe
     Stripe::setApiKey($stripeSecretKey);
     error_log('API ключ Stripe успешно установлен');
 
-    // Проверяем данные о сумме
+    // Валидация и проверка email для квитанции
+    $email = filter_var(trim($input['email'] ?? ''), FILTER_VALIDATE_EMAIL);
+    if (!$email) {
+        throw new Exception('Неверный формат email.');
+    }
+    error_log('Проверенный email: ' . $email);
+
+    // Проверка данных о сумме
     if (!isset($input['total_price']) || !is_numeric($input['total_price']) || $input['total_price'] <= 0) {
         throw new Exception('Неверная или отсутствующая общая сумма.');
     }
-    $totalPrice = floatval($input['total_price']) * 100; // Переводим в грош (pln -> grosze)
+    // Перевод суммы в grosze (1 PLN = 100 groszy)
+    $totalPrice = floatval($input['total_price']) * 100;
     error_log('Общая сумма заказа: ' . $totalPrice . ' grosze');
 
-    // Проверяем наличие пакетов
+    // Проверяем наличие данных о пакетах
     if (empty($input['packages']) || !is_array($input['packages'])) {
         throw new Exception('Отсутствуют данные о пакетах или они не определены.');
     }
@@ -86,20 +92,19 @@ try {
     }
     error_log('Используемый order_id для метаданных Stripe: ' . $orderId);
 
-    // Извлекаем информацию о скидке и общей сумме без учета скидки (только для информации)
+    // Извлекаем информацию о скидке и сумме без скидки (для отображения)
     $discount = floatval($input['discount'] ?? 0);
     $totalWithoutDiscount = floatval($input['total_without_discount'] ?? 0);
-
-    // Вычисляем коэффициент скидки (только для отображения)
     $discountFactor = 1;
     if ($totalWithoutDiscount > 0 && $discount > 0) {
         $discountFactor = ($totalWithoutDiscount - $discount) / $totalWithoutDiscount;
     }
     error_log('Коэффициент скидки: ' . $discountFactor);
 
+    // Формируем массив line_items для Stripe Checkout
     $lineItems = [];
     foreach ($input['packages'] as $package) {
-        // Внесенные проверки для каждого пакета
+        // Валидация данных каждого пакета
         if (!isset($package['calories']) || !is_string($package['calories'])) {
             throw new Exception('Неверные данные: calories отсутствует или не является строкой.');
         }
@@ -119,47 +124,50 @@ try {
             $deliveryDates = implode(', ', array_map('htmlspecialchars', $package['dates']));
         }
 
-        // Фильтруем данные каждого пакета
+        // Фильтрация данных для безопасности
         $filteredPackage = [
             'calories' => htmlspecialchars($package['calories'], ENT_QUOTES, 'UTF-8'),
-            'price' => number_format($discountedPrice, 2, '.', ''),
+            'price'    => number_format($discountedPrice, 2, '.', ''),
             'quantity' => intval($package['quantity']),
-            'dates' => $deliveryDates
+            'dates'    => $deliveryDates
         ];
 
         $lineItems[] = [
             'price_data' => [
-                'currency' => 'pln',
+                'currency'     => 'pln',
                 'product_data' => [
-                    'name' => 'Paczka: ' . $filteredPackage['calories'],
-                    'description' => 'Kalorie: ' . $filteredPackage['calories'] . '. Ilość: ' . $filteredPackage['quantity'] . '. Terminy dostaw: ' . $filteredPackage['dates'],
-                    'images' => ['https://foodcasecatering.net/assets/img/logo.png'],
+                    'name'        => 'Paczka: ' . $filteredPackage['calories'],
+                    'description' => 'Kalorie: ' . $filteredPackage['calories'] .
+                                     '. Ilość: ' . $filteredPackage['quantity'] .
+                                     '. Terminy dostaw: ' . $filteredPackage['dates'],
+                    'images'      => ['https://foodcasecatering.net/assets/img/logo.png'],
                 ],
-                'unit_amount' => intval($filteredPackage['price'] * 100),
+                // Преобразуем цену за пакет в grosze
+                'unit_amount'  => intval($filteredPackage['price'] * 100),
             ],
             'quantity' => $filteredPackage['quantity'],
         ];
     }
-
     error_log('Собранные line items для Stripe: ' . print_r($lineItems, true));
 
-    // Создаем сессию Stripe Checkout
+    // Создаем Stripe Checkout Session
+    // Обратите внимание: параметр 'customer_email' используется для отправки клиенту электронных квитанций.
     error_log('Пытаемся создать Stripe Checkout Session...');
-    $session = \Stripe\Checkout\Session::create([
+    $session = Session::create([
         'payment_method_types' => ['card', 'blik'],
-        'line_items' => $lineItems,
-        'mode' => 'payment',
-        'success_url' => 'https://foodcasecatering.net/payments/success.php?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => 'https://foodcasecatering.net/payments/cancel.php',
-        'client_reference_id' => session_id(),
-        'customer_email' => $input['email'],
-        'metadata' => [
+        'line_items'           => $lineItems,
+        'mode'                 => 'payment',
+        'success_url'          => 'https://foodcasecatering.net/payments/success.php?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url'           => 'https://foodcasecatering.net/payments/cancel.php',
+        'client_reference_id'  => session_id(),
+        'customer_email'       => $email,
+        'metadata'             => [
             'order_id' => strval($orderId)
         ],
     ]);
-
     error_log('Stripe Checkout Session успешно создан. ID: ' . $session->id);
 
+    // Отправляем ID сессии клиенту
     echo json_encode(['id' => $session->id]);
 
 } catch (\Stripe\Exception\ApiErrorException $e) {

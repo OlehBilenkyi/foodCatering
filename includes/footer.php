@@ -21,7 +21,7 @@
           </li>
 
           <li class="footer__item"><a href="/prices/" class="footer__link">Zobacz ceny</a></li>
-          <li class="footer__item"><a href="/index2/" class="footer__link">Złóż zamówienie</a></li>
+       
           <li class="footer__item"><a href="/privacy_policy/" class="footer__link">Polityka prywatności</a></li>
           <li class="footer__item"><a href="/regulamin/" class="footer__link">Regulamin</a></li>
         </ul>
