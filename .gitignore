@@ -14,3 +14,4 @@ vendor/
 # System files
 .DS_Store
 Thumbs.db
+.well-known
