@@ -89,7 +89,7 @@ Dostawa gotowych posiłków
 </defs>
 </svg>
 </span>
-Nasze opakowanie nie szkodzi nature.
+Nasze opakowanie nie szkodzi nature..
 </p>
 </div>
 <a href=#menu class="btn promo__btn js-scroll-link">Zobacz menu</a>
