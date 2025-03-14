@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/assets/stylescss/styles_paket.css">
+  <title>Etykiety Menu do Wyboru na Opakowania</title>
+</head>
+<body>
+  <div class="container" id="sticker-container">
+    <!-- Здесь будут сгенерированные стикеры -->
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const packageStickerDataJSON = localStorage.getItem('packageStickerData');
+        if (!packageStickerDataJSON) {
+            alert('Нет данных для генерации наклеек.');
+            console.error('packageStickerData отсутствует в localStorage');
+            window.location.href = "/admin/orders_summary.php";
+            return;
+        }
+
+        let packageStickerData = JSON.parse(packageStickerDataJSON);
+        console.log("📦 Загруженные данные из localStorage:", JSON.stringify(packageStickerData, null, 2));
+
+        if (!packageStickerData.packages || packageStickerData.packages.length === 0) {
+            alert('Нет данных для генерации наклеек.');
+            console.error('packageStickerData.packages пуст');
+            window.location.href = "/admin/orders_summary.php";
+            return;
+        }
+
+        const container = document.getElementById('sticker-container');
+        container.innerHTML = ""; // Очищаем контейнер перед вставкой
+
+        packageStickerData.packages.forEach((packageInfo) => {
+            const stickerElement = document.createElement('div');
+            stickerElement.classList.add('sticker-paket');
+
+            const address = packageInfo.address || "Не указан адрес";
+            const houseNumber = packageInfo.houseNumber || "";
+            const apartment = packageInfo.apartment || "";
+            const fullAddress = `${address} ${houseNumber} / ${apartment}`.trim();
+
+            console.log(`🖨 Генерируем наклейку для адреса: ${fullAddress}`);
+
+            stickerElement.innerHTML = `
+              <div class="sticker-paket-header">
+                <h1 class="title-text">Menu: Menu do Wyboru</h1>
+                <img class="logo-image" src="/assets/img/sticker_container.png" alt="Logo" />
+              </div>
+              <div class="sticker-paket-info">
+                <div class="info-block">
+                  <span class="info-label">Adres:</span>
+                  <span class="info-value">${fullAddress}</span>
+                </div>
+                <div class="info-block">
+                  <span class="info-label">Data:</span>
+                  <span class="info-value">${packageStickerData.delivery_date}</span>
+                </div>
+              </div>
+            `;
+
+            container.appendChild(stickerElement);
+        });
+
+        console.log(`✅ Генерация завершена. Создано ${packageStickerData.packages.length} наклеек.`);
+    });
+  </script>
+</body>
+</html>

@@ -15,9 +15,8 @@ $dotenv->load();
 
 // Секретный ключ вебхука
 $endpoint_secret = $_ENV['STRIPE_WEBHOOK_SECRET'] ?? null;
-
 if (!$endpoint_secret) {
-    error_log("Ошибка: Секретный ключ вебхука отсутствует.");
+    error_log("❌ Ошибка: Секретный ключ вебхука отсутствует.");
     http_response_code(500);
     exit();
 }
@@ -33,9 +32,9 @@ try {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]
     );
-    error_log("Успешное подключение к базе данных для пользователя " . $_ENV['DB_USER']);
+    error_log("✅ Успешное подключение к базе данных.");
 } catch (PDOException $e) {
-    error_log("Ошибка подключения к базе данных: " . $e->getMessage());
+    error_log("❌ Ошибка подключения к базе данных: " . $e->getMessage());
     http_response_code(500);
     exit();
 }
@@ -47,163 +46,79 @@ $event = null;
 
 try {
     if (!$sig_header) {
-        error_log("Ошибка: Отсутствует заголовок Stripe Signature.");
+        throw new Exception("❌ Ошибка: Отсутствует заголовок Stripe Signature.");
+    }
+    $event = Webhook::constructEvent($payload, $sig_header, $endpoint_secret);
+    error_log("✅ Событие от Stripe успешно верифицировано.");
+} catch (Exception $e) {
+    http_response_code(400);
+    error_log($e->getMessage());
+    exit();
+}
+
+// Проверка события checkout.session.completed
+if ($event->type === 'checkout.session.completed') {
+    error_log("✅ Получено событие checkout.session.completed");
+    $session = $event->data->object;
+    $orderId = $session->metadata->order_id ?? null;
+
+    if (!$orderId) {
+        error_log("❌ Ошибка: order_id отсутствует в метаданных Stripe.");
         http_response_code(400);
         exit();
     }
 
-    $event = Webhook::constructEvent($payload, $sig_header, $endpoint_secret);
-    error_log('Событие от Stripe успешно верифицировано.');
-} catch (\UnexpectedValueException $e) {
-    http_response_code(400);
-    error_log("Недопустимое тело запроса: " . $e->getMessage());
-    exit();
-} catch (\Stripe\Exception\SignatureVerificationException $e) {
-    http_response_code(400);
-    error_log("Подпись не прошла проверку: " . $e->getMessage());
-    exit();
-}
+    error_log("ℹ️ Обработка заказа с order_id: $orderId");
 
-// Проверка и обработка события вебхука
-try {
-    if ($event->type === 'checkout.session.completed') {
-        error_log('Получено событие checkout.session.completed');
-        $session = $event->data->object;
+    $order = getOrderFromDB($pdo, 'orders', $orderId);
+    $menuOrder = getOrderFromDB($pdo, 'customer_menu_orders', $orderId);
 
-        // Извлекаем order_id из метаданных
-        $orderId = $session->metadata->order_id ?? null;
-        error_log("Полученный order_id из метаданных: " . $orderId);
+    if ($order) {
+        updateOrderStatus($pdo, 'orders', $orderId, 'оплачен');
+        $orderItems = getOrderItems($pdo, 'orders', $orderId);
+        $emailTemplate = __DIR__ . '/../emails/order_confirmation_template.php';
+        $customerEmail = $order['customer_email'];
+    } elseif ($menuOrder) {
+    updateOrderStatus($pdo, 'customer_menu_orders', $orderId, 'paid');
 
-        if ($orderId) {
-            try {
-                $stmt = $pdo->prepare("SELECT * FROM orders WHERE order_id = :order_id");
-                $stmt->execute([':order_id' => $orderId]);
-                $order = $stmt->fetch();
+    // Получаем позиции меню
+    $rawOrderItems = getOrderItems($pdo, 'customer_menu_orders', $orderId);
 
-                if ($order) {
-                    error_log("Найден заказ с order_id $orderId, текущий статус: " . $order['status']);
-
-                    if ($order['status'] === 'оплачен') {
-                        error_log("Предотвращено повторное выполнение запроса для order_id: " . $orderId);
-                        http_response_code(200);
-                        exit();
-                    }
-
-                    $stmt = $pdo->prepare("UPDATE orders SET status = 'оплачен' WHERE order_id = :order_id");
-                    $stmt->execute([':order_id' => $orderId]);
-                    error_log("Заказ с order_id $orderId успешно обновлен на статус 'оплачен'.");
-
-                    // Генерируем детали пакетов и дат доставки для email
-                    $package_details = generatePackageDetails($pdo, $orderId);
-
-                    if (empty($package_details)) {
-                        error_log("Ошибка: Детали пакетов для order_id $orderId отсутствуют.");
-                        http_response_code(500);
-                        exit();
-                    }
-
-                    // Подготавливаем данные для шаблона email
-                    $order_date = $order['created_at'];
-                    $total_amount = $order['total_price'] . ' zł';
-                    $customer_email = $order['customer_email'];
-                    $customer_phone = $order['customer_phone'];
-                    $customer_name = $order['customer_fullname'];
-                    $customer_street = $order['customer_street'];
-                    $customer_house_number = $order['customer_house_number'];
-                    $customer_floor = $order['customer_floor'];
-                    $customer_apartment = $order['customer_apartment'];
-                    $customer_gate_code = $order['customer_gate_code'];
-                    $customer_notes = $order['customer_notes'];
-                    $customer_klatka = $order['customer_klatka']; // Добавляем klatka
-
-                    // Логирование содержимого package_details
-                    error_log("Содержимое переменной \$package_details для отправки в шаблон: " . $package_details);
-
-                    ob_start();
-                    include __DIR__ . '/../emails/order_confirmation_template.php';
-                    $templateContent = ob_get_clean();
-
-                    $customerEmail = $order['customer_email'];
-                    $sellerEmail = $_ENV['SMTP_USERNAME'];
-
-                    // Отправка email покупателю и продавцу
-                    $customerSent = sendEmail($customerEmail, 'Potwierdzenie zamówienia - FoodCase', $templateContent);
-                    if ($customerSent) {
-                        error_log("Письмо покупателю успешно отправлено на: " . $customerEmail);
-                    } else {
-                        error_log("Ошибка при отправке письма покупателю на: " . $customerEmail);
-                    }
-
-                    $sellerSent = sendEmail($sellerEmail, 'Nowe zamówienie - FoodCase', $templateContent);
-                    if ($sellerSent) {
-                        error_log("Письмо продавцу успешно отправлено на: " . $sellerEmail);
-                    } else {
-                        error_log("Ошибка при отправке письма продавцу на: " . $sellerEmail . ". Проверьте настройки SMTP.");
-                    }
-                } else {
-                    error_log("Ошибка: заказ с order_id $orderId не найден в базе данных.");
-                    http_response_code(404);
-                }
-            } catch (PDOException $e) {
-                error_log("Ошибка при выполнении запроса к базе данных: " . $e->getMessage());
-                http_response_code(500);
-                exit();
-            }
-        } else {
-            error_log("Ошибка: order_id не найден в metadata.");
-            http_response_code(400);
-            exit();
+    // Группируем по датам доставки
+    $orderItems = [];
+    foreach ($rawOrderItems as $item) {
+        $date = $item['delivery_date'];
+        if (!isset($orderItems[$date])) {
+            $orderItems[$date] = [
+                'delivery_date' => $date,
+                'day_total_price' => $item['day_total_price'],
+                'items' => []
+            ];
         }
+        if (!empty($item['dish_name'])) {
+            $orderItems[$date]['items'][] = [
+                'category' => $item['category'],
+                'dish_name' => $item['dish_name'],
+                'weight' => $item['weight'],
+                'price' => $item['price']
+            ];
+        }
+    }
 
-    } else {
-        error_log('Получено неопознанное событие: ' . $event->type);
+    $emailTemplate = __DIR__ . '/../emails/menu_order_confirmation_template.php';
+    $customerEmail = $menuOrder['delivery_email'];
+} else {
+        error_log("❌ Ошибка: заказ #$orderId не найден.");
+        http_response_code(404);
+        exit();
+    }
+
+    if (empty($customerEmail)) {
+        error_log("⚠️ Ошибка: email не найден для заказа #$orderId.");
         http_response_code(400);
+        exit();
     }
-
-    http_response_code(200);
-} catch (Exception $e) {
-    error_log("Ошибка обработки вебхука: " . $e->getMessage());
-    http_response_code(500);
-    exit();
-}
-
-// Функция для отправки email с использованием SMTP
-function sendEmail($email, $subject, $body) {
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = $_ENV['SMTP_HOST'];
-        $mail->SMTPAuth = true;
-        $mail->Username = $_ENV['SMTP_USERNAME'];
-        $mail->Password = $_ENV['SMTP_PASSWORD'];
-        $mail->SMTPSecure = $_ENV['SMTP_SECURE'];
-        $mail->Port = $_ENV['SMTP_PORT'];
-        $mail->setFrom($_ENV['SMTP_USERNAME'], 'FoodCase'); // Основной email отправителя
-        $mail->addReplyTo($_ENV['SMTP_USERNAME'], 'FoodCase Support'); // Email для ответов
-        $mail->addAddress($email);
-        $mail->CharSet = 'UTF-8';
-        $mail->Subject = $subject;
-        $mail->isHTML(true);
-
-        // Вставляем изображение логотипа как встроенное изображение
-        $mail->AddEmbeddedImage('../assets/img/logo.png', 'logo_image'); // Замените путь к логотипу на правильный
-        $body = str_replace('src="https://foodcasecatering.net/assets/img/logo.png"', 'src="cid:logo_image"', $body);
-
-        // Устанавливаем тело письма
-        $mail->Body = $body;
-
-        // Отправляем письмо
-        $mail->send();
-        error_log("Email успешно отправлен на $email");
-        return true;
-    } catch (Exception $e) {
-        error_log("Ошибка при отправке email на $email: " . $e->getMessage());
-        return false;
-    }
-}
-
-// Функция для генерации деталей пакета для email, включая даты доставки
-function generatePackageDetails($pdo, $orderId) {
+function getPackageDetails($pdo, $orderId) {
     try {
         $stmt = $pdo->prepare("SELECT * FROM order_packages WHERE order_id = :order_id");
         $stmt->execute([':order_id' => $orderId]);
@@ -229,4 +144,121 @@ function generatePackageDetails($pdo, $orderId) {
     }
 }
 
-?>
+$emailData = [
+    'orderId' => $orderId,
+    'order_date' => $order['created_at'] ?? $menuOrder['order_date'] ?? 'Nie podano',
+    'total_amount' => ($order['total_price'] ?? $menuOrder['total_price'] ?? '0.00') . ' zł',
+    'delivery_email' => $order['customer_email'] ?? $menuOrder['delivery_email'] ?? 'Nie podano',
+    'customer_email' => $order['customer_email'] ?? $menuOrder['delivery_email'] ?? 'Nie podano', // Дублируем для разных названий
+    'phone' => $order['customer_phone'] ?? $menuOrder['phone'] ?? 'Nie podano',
+    'customer_phone' => $order['customer_phone'] ?? $menuOrder['phone'] ?? 'Nie podano',
+    'full_name' => $order['customer_fullname'] ?? $menuOrder['full_name'] ?? 'Nie podano',
+    'customer_name' => $order['customer_fullname'] ?? $menuOrder['full_name'] ?? 'Nie podano',
+    'street' => $order['customer_street'] ?? $menuOrder['street'] ?? 'Nie podano',
+    'customer_street' => $order['customer_street'] ?? $menuOrder['street'] ?? 'Nie podano',
+    'house_number' => $order['customer_house_number'] ?? $menuOrder['house_number'] ?? 'Nie podano',
+    'customer_house_number' => $order['customer_house_number'] ?? $menuOrder['house_number'] ?? 'Nie podano',
+    'building' => $order['customer_building'] ?? $menuOrder['building'] ?? 'Nie podano',
+    'customer_building' => $order['customer_building'] ?? $menuOrder['building'] ?? 'Nie podano',
+    'floor' => $order['customer_floor'] ?? $menuOrder['floor'] ?? 'Nie podano',
+    'customer_floor' => $order['customer_floor'] ?? $menuOrder['floor'] ?? 'Nie podano',
+    'apartment' => $order['customer_apartment'] ?? $menuOrder['apartment'] ?? 'Nie podano',
+    'customer_apartment' => $order['customer_apartment'] ?? $menuOrder['apartment'] ?? 'Nie podano',
+    'entry_code' => $order['customer_gate_code'] ?? $menuOrder['entry_code'] ?? 'Nie podano',
+    'customer_gate_code' => $order['customer_gate_code'] ?? $menuOrder['entry_code'] ?? 'Nie podano',
+    'klatka' => $order['customer_klatka'] ?? $menuOrder['building'] ?? 'Nie podano',
+    'customer_klatka' => $order['customer_klatka'] ?? $menuOrder['building'] ?? 'Nie podano',
+    'notes' => $order['customer_notes'] ?? $menuOrder['notes'] ?? 'Nie podano',
+    'customer_notes' => $order['customer_notes'] ?? $menuOrder['notes'] ?? 'Nie podano',
+       // Позиции заказа
+    'order_items' => array_values($orderItems),
+
+    // Детали пакетов (если есть)
+    'package_details' => getPackageDetails($pdo, $orderId) ?? 'Brak danych'
+];
+
+    error_log("ℹ️ Email Data: " . print_r($emailData, true));
+
+    ob_start();
+    extract($emailData);
+    include $emailTemplate;
+    $emailBody = ob_get_clean();
+
+    sendEmail($customerEmail, "Potwierdzenie zamówienia - FoodCase", $emailBody);
+    sendEmail($_ENV['SMTP_USERNAME'], "Nowe zamówienie - FoodCase", $emailBody);
+    error_log("✅ Email отправлен покупателю: $customerEmail");
+}
+
+http_response_code(200);
+exit();
+
+// Функция для генерации деталей пакета для email, включая даты доставки
+
+
+// Функции для работы с базой данных
+function getOrderFromDB($pdo, $table, $orderId) {
+    $stmt = $pdo->prepare("SELECT * FROM $table WHERE order_id = :order_id");
+    $stmt->execute([':order_id' => $orderId]);
+    return $stmt->fetch();
+}
+
+function updateOrderStatus($pdo, $table, $orderId, $status) {
+    $stmt = $pdo->prepare("UPDATE $table SET status = :status WHERE order_id = :order_id");
+    $stmt->execute([':status' => $status, ':order_id' => $orderId]);
+}
+
+function getOrderItems($pdo, $table, $orderId) {
+    if ($table === 'orders') {
+        $query = "
+            SELECT op.calories, op.quantity, dd.delivery_date
+            FROM order_packages op
+            LEFT JOIN delivery_dates dd ON op.id = dd.order_package_id
+            WHERE op.order_id = :order_id
+        ";
+    } else {
+        $query = "
+            SELECT 
+                cmd.delivery_date, 
+                cmd.day_total_price, 
+                cmi.category, 
+                cmi.dish_name, 
+                cmi.weight, 
+                cmi.price
+            FROM customer_menu_order_days cmd
+            LEFT JOIN customer_menu_order_items cmi ON cmd.order_day_id = cmi.order_day_id
+            WHERE cmd.order_id = :order_id
+        ";
+    }
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([':order_id' => $orderId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+
+}
+
+
+
+
+// Функция отправки email
+function sendEmail($email, $subject, $body) {
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = $_ENV['SMTP_HOST'];
+        $mail->SMTPAuth = true;
+        $mail->Username = $_ENV['SMTP_USERNAME'];
+        $mail->Password = $_ENV['SMTP_PASSWORD'];
+        $mail->SMTPSecure = $_ENV['SMTP_SECURE'];
+        $mail->Port = $_ENV['SMTP_PORT'];
+        $mail->setFrom($_ENV['SMTP_USERNAME'], 'FoodCase');
+        $mail->addAddress($email);
+        $mail->CharSet = 'UTF-8';
+        $mail->Subject = $subject;
+        $mail->isHTML(true);
+        $mail->Body = $body;
+        $mail->send();
+    } catch (Exception $e) {
+        error_log("❌ Ошибка при отправке email: " . $e->getMessage());
+    }
+}

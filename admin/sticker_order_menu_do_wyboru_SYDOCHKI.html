@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generowanie Naklejek - Sydochki</title>
+    <link rel="stylesheet" href="/assets/stylescss/sticker.css">
+</head>
+<body>
+    <div class="container" id="stickers-container"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const stickerData = JSON.parse(localStorage.getItem('stickerDataSYDOCHKI'));
+
+            if (!stickerData || !stickerData.delivery_date) {
+                alert('Proszę wybrać datę dostawy w panelu administracyjnym!');
+                window.close();
+                return;
+            }
+
+            fetch(`/admin/admin_orders_menu_do_wyboru.php?generate_stickers=1&delivery_date=${stickerData.delivery_date}`)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+                    generateStickers(data);
+                })
+                .catch(error => {
+                    console.error('Błąd:', error);
+                    alert(`Błąd: ${error.message}`);
+                });
+        });
+
+        function generateStickers(response) {
+            const stickersContainer = document.getElementById('stickers-container');
+
+            if (!response?.packages?.length) {
+                alert('Brak danych w odpowiedzi serwera!');
+                return;
+            }
+
+            response.packages.forEach(pkg => {
+                if (!pkg.package || !pkg.title_text || !pkg.ingredients) return;
+
+               // Категория с первой буквой заглавной
+let categoryText = "";
+switch (pkg.package) {
+    case "śniadanie":
+        categoryText = "S";
+        break;
+    case "obiad":
+        categoryText = "O";
+        break;
+    case "kolacja":
+        categoryText = "K";
+        break;
+}
+
+// Вставляем `categoryText` в `infoText`
+const infoText = ` ${categoryText} - ${pkg.menu_options_id} - 
+   ${pkg.weight || "указано"} - ${pkg.order_id || "не указано"}`;
+
+
+                const stickerHTML = `
+                    <div class="sticker">
+                        <div class="title">
+                            <h1 class="title__text">${pkg.title_text}</h1>
+                            <div class="callorii">${infoText}</div>
+                        </div>
+                        <div class="composition">
+                            <div class="composition__text">
+                                <div class="ingredients"><strong>Składniki:</strong> ${pkg.ingredients}</div>
+                                <div class="allergens"><strong>Alergeny:</strong> ${pkg.allergens}</div>
+                            </div>
+                            <div><img src="/assets/img/sticker.png" alt="Naklejka" class="img"></div>
+                        </div>
+                        <div class="desc">
+                            <h2 class="desc__title">Wartość odżywcza w porcji:</h2>
+                            <div class="portion">
+                                <div class="energy">Energia: <strong>${pkg.energy}</strong> kcal</div>
+                                <div class="fat">Tłuszcz: <strong>${pkg.fat}</strong> g</div>
+                                <div class="carbohydrates">Węglowodany: <strong>${pkg.carbohydrates}</strong> g</div>
+                                <div class="protein">Białko: <strong>${pkg.protein}</strong> g</div>
+                                <div class="sol">Sól: <strong>${pkg.salt}</strong> g</div>
+                            </div>
+                            <div class="desc__dowm">Wartość odżywcza jest przybliżona i może się różnić.</div>
+                        </div>
+                        <div class="footer">
+                            <div class="footer__text">Przechowywać w temperaturze od 0°C do 8°C. Po otrzymaniu spożyć w ciągu 24 godzin.</div>
+                        </div>
+                        <div class="net_mass_container">
+                            <div class="data_right">Data: ${pkg.delivery_date}</div>
+                        </div>
+                    </div>
+                `;
+
+                stickersContainer.insertAdjacentHTML('beforeend', stickerHTML);
+            });
+
+            setTimeout(() => window.print(), 500);
+        }
+    </script>
+</body>
+</html>

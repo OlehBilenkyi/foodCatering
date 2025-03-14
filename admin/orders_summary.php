@@ -319,13 +319,7 @@ try {
         </table>
     <?php endif; ?>
 </div>
-
-
-        <!-- Права інформація о кількості клієнтів -->
-        <div class="client-count-inline">
-            Загальна кількість клієнтів: <?= htmlspecialchars($totalClients) ?> <!-- Отображаем загальну кількість клієнтів справа -->
-        </div>
-    </div>
+ </div>
 
 <?php if (!empty($result)): ?>
     <table class="order-summary-table">
@@ -733,87 +727,89 @@ function editOrder(orderId) {
 
 
 <style>
-/* Стили для новых заказов */
-.new-order {
-    background-color: #e8f5e9; /* Зеленый фон */
-    animation: highlightNewOrder 3s ease-in-out infinite alternate;
-}
+        /* Стили для новых заказов */
+        .new-order {
+            background-color: #e8f5e9; /* Зеленый фон */
+            animation: highlightNewOrder 3s ease-in-out infinite alternate;
+        }
 
-/* Стили для просмотренных заказов */
-.viewed-order {
-    background-color: #ffffff; /* Белый фон */
-    animation: none;
-}
+        /* Стили для просмотренных заказов */
+        .viewed-order {
+            background-color: #ffffff; /* Белый фон */
+            animation: none;
+        }
 
-/* Анимация для новых заказов */
-@keyframes highlightNewOrder {
-    0% {
-        background-color: #e8f5e9;
-    }
-    100% {
-        background-color: #c8e6c9;
-    }
-}
+        /* Анимация для новых заказов */
+        @keyframes highlightNewOrder {
+            0% {
+                background-color: #e8f5e9;
+            }
+            100% {
+                background-color: #c8e6c9;
+            }
+        }
 
+        /* Стили для кнопки "Деталі" */
+        .details-button {
+            background-color: #007bff; /* Синий фон */
+            color: #fff; /* Белый текст */
+            border: none; /* Убираем границы */
+            padding: 5px 10px; /* Отступы внутри кнопки */
+            border-radius: 4px; /* Скругленные углы */
+            text-align: center; /* Центрируем текст */
+            text-decoration: none; /* Убираем подчеркивание текста */
+            font-size: 14px; /* Размер шрифта */
+            cursor: pointer; /* Указатель при наведении */
+            transition: background-color 0.3s ease; /* Плавный переход цвета фона */
+        }
 
-    /* Стили для кнопки "Деталі" */
-    .details-button {
-        background-color: #007bff; /* Синий фон */
-        color: #fff; /* Белый текст */
-        border: none; /* Убираем границы */
-        padding: 5px 10px; /* Отступы внутри кнопки */
-        border-radius: 4px; /* Скругленные углы */
-        text-align: center; /* Центрируем текст */
-        text-decoration: none; /* Убираем подчеркивание текста */
-        font-size: 14px; /* Размер шрифта */
-        cursor: pointer; /* Указатель при наведении */
-        transition: background-color 0.3s ease; /* Плавный переход цвета фона */
-    }
+        /* Стили при наведении на кнопку "Деталі" */
+        .details-button:hover {
+            background-color: #0056b3; /* Более темный синий при наведении */
+        }
 
-    /* Стили при наведении на кнопку "Деталі" */
-    .details-button:hover {
-        background-color: #0056b3; /* Более темный синий при наведении */
-    }
+        /* Стили при клике на кнопку "Деталі" */
+        .details-button:active {
+            background-color: #004494; /* Ещё темнее при клике */
+        }
 
-    /* Стили при клике на кнопку "Деталі" */
-    .details-button:active {
-        background-color: #004494; /* Ещё темнее при клике */
-    }
+        /* Центрирование содержимого ячейки */
+        .center-cell {
+            text-align: center; /* Горизонтальное центрирование */
+            vertical-align: middle; /* Вертикальное центрирование */
+        }
 
-    /* Центрирование содержимого ячейки */
-    .center-cell {
-        text-align: center; /* Горизонтальное центрирование */
-        vertical-align: middle; /* Вертикальное центрирование */
-    }
-    /* Стили для информации о количестве клиентов */
-    .client-count-inline {
-        text-align: right; /* Выравнивание текста справа */
-        font-size: 1em; /* Размер текста */
-        font-weight: bold; /* Немного выделить текст */
-        margin-top: 10px; /* Отступ сверху, чтобы немного отделить от таблицы */
-    }
-    /* Стили для уменьшения ширины таблицы */
-    .packages-info table.order-summary-table {
-        width: 390px; /* Регулируем ширину для уменьшения */
-        margin: 0 auto; /* Центрирование таблицы по горизонтали */
-    }
+        /* Стили для информации о количестве клиентов */
+        .client-count-inline {
+            text-align: right; /* Выравнивание текста справа */
+            font-size: 1em; /* Размер текста */
+            font-weight: bold; /* Немного выделить текст */
+            margin-top: 10px; /* Отступ сверху, чтобы немного отделить от таблицы */
+        }
 
-    /* Уменьшаем отступы внутри ячеек */
-    .packages-info table.order-summary-table th,
-    .packages-info table.order-summary-table td {
-        padding: 5px; /* Уменьшение отступов для компактного вида */
-    }
+        /* Стили для уменьшения ширины таблицы */
+        .packages-info table.order-summary-table {
+            width: 100%; /* Регулируем ширину для уменьшения */
+            margin: 0 auto; /* Центрирование таблицы по горизонтали */
+        }
 
-    /* Уменьшаем размер шрифта заголовка */
-    .packages-info h2 {
-        font-size: 1.2em; /* Можно регулировать для нужного размера заголовка */
-        text-align: center; /* Выравниваем заголовок по центру */
-    }
+        /* Уменьшаем отступы внутри ячеек */
+        .packages-info table.order-summary-table th,
+        .packages-info table.order-summary-table td {
+            padding: 5px; /* Уменьшение отступов для компактного вида */
+        }
 
-    /* Уменьшаем общий размер шрифта таблицы для большей компактности */
-    .packages-info table.order-summary-table {
-        font-size: 0.9em; /* Меньший размер шрифта таблицы */
-    }
+        /* Уменьшаем размер шрифта заголовка */
+        .packages-info h2 {
+            font-size: 1.2em; /* Можно регулировать для нужного размера заголовка */
+            text-align: center; /* Выравниваем заголовок по центру */
+        }
+
+        /* Уменьшаем общий размер шрифта таблицы для большей компактности */
+        .packages-info table.order-summary-table {
+            font-size: 0.9em; /* Меньший размер шрифта таблицы */
+        }
+
         /* Настройка ширины колонок таблицы */
         .order-summary-table th:nth-child(7),
         .order-summary-table td:nth-child(7) {
@@ -828,430 +824,478 @@ function editOrder(orderId) {
         .order-summary-table td button {
             margin-right: 5px; /* Расстояние между кнопками для визуального комфорта */
         }
-       /* Сужение колонки "Інформація про Пакети" */
-    .narrow-info {
-        width: 120px; /* Можно задать нужное значение ширины */
-        max-width: 120px; /* Ограничение максимальной ширины */
-        text-align: center; /* Центрирование содержимого для более аккуратного вида */
-        overflow: hidden; /* Прячет часть текста, если она слишком длинная */
-        text-overflow: ellipsis; /* Добавляет "..." в случае, если текст не помещается */
-    }
 
-    /* Сужение колонки "Код дверей" */
-    .narrow-column {
-        width: 70px; /* Настройте ширину по своему усмотрению */
-        text-align: center; /* Центрирование содержимого */
-    }
-.info-container {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: nowrap;
-    flex-direction: row-reverse;
-}
+        /* Сужение колонки "Інформація про Пакети" */
+        .narrow-info {
+            width: 120px; /* Можно задать нужное значение ширины */
+            max-width: 120px; /* Ограничение максимальной ширины */
+            text-align: center; /* Центрирование содержимого для более аккуратного вида */
+            overflow: hidden; /* Прячет часть текста, если она слишком длинная */
+            text-overflow: ellipsis; /* Добавляет "..." в случае, если текст не помещается */
+        }
 
-.packages-info {
-    flex: 1;
-}
+        /* Сужение колонки "Код дверей" */
+        .narrow-column {
+            width: 70px; /* Настройте ширину по своему усмотрению */
+            text-align: center; /* Центрирование содержимого */
+        }
 
-.client-count {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 10px;
-    background: #f7f7f7;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-/* Стили для управления размерами и выравниванием */
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f7f7f7;
-    margin: 0;
-    padding: 0;
-}
+        .info-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: nowrap;
+            flex-direction: row-reverse;
+        }
 
-.admin-container {
-    width: 100%;
-    max-width: none;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+        .packages-info {
+            flex: 1;
+        }
 
-h1 {
-    font-size: 24px;
-    color: #1565c0;
-    margin-bottom: 20px;
-    text-align: center;
-}
+        .client-count {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+            background: #f7f7f7;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-/* Контейнер для фильтрации и управления */
-.filter-and-control-container {
-    width: 100%;
-    margin-bottom: 20px;
-}
+        /* Стили для управления размерами и выравниванием */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
 
-/* Верхняя часть с кнопками добавления и возвращения */
-.top-button-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
+        .admin-container {
+            width: 100%;
+            max-width: none;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
+        h1 {
+            font-size: 24px;
+            color: #1565c0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-.btn-return {
-    padding: 8px 15px; /* Сделали кнопки компактнее */
-    background-color: #1565c0;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-    margin: 5px;
-}
+        /* Контейнер для фильтрации и управления */
+        .filter-and-control-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
 
+        /* Верхняя часть с кнопками добавления и возвращения */
+        .top-button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-.btn-return:hover {
-    background-color: #003c8f;
-}
-.add-order-button {
-    padding: 12px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
+        .btn-return {
+            padding: 8px 15px; /* Сделали кнопки компактнее */
+            background-color: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
 
-.add-order-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 0px 20px rgba(40, 167, 69, 0.5);
-}
+        .btn-return:hover {
+            background-color: #003c8f;
+        }
 
+        .add-order-button {
+            padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
 
-/* Форма фильтрации */
-.filter-form {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 20px;
-}
+        .add-order-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 20px rgba(40, 167, 69, 0.5);
+        }
 
-/* Левый блок формы: поля фильтрации по ID и Email, кнопки фильтрации и сброса */
-.form-left-section {
-    float: left;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
+        /* Форма фильтрации */
+        .filter-form {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
 
-.form-left-section input {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 150px;
-}
+        /* Левый блок формы: поля фильтрации по ID и Email, кнопки фильтрации и сброса */
+        .form-left-section {
+            float: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
 
-.filter-button {
-    padding: 8px 15px;
-    background-color: #1565c0;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
+        .form-left-section input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 150px;
+        }
 
-.filter-button:hover {
-    background-color: #003c8f;
-}
+        .filter-button {
+            padding: 8px 15px;
+            background-color: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
 
-/* Центр: радио-кнопки для фильтрации по статусу */
-.status-filter-container {
-    text-align: center;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
+        .filter-button:hover {
+            background-color: #003c8f;
+        }
 
-.status-filter-container label {
-    font-size: 14px;
-}
+        /* Центр: радио-кнопки для фильтрации по статусу */
+        .status-filter-container {
+            text-align: center;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-/* Правый блок формы: поля выбора даты и недели + кнопка генерации наклеек */
-.form-right-section {
-    float: right;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        .status-filter-container label {
+            font-size: 14px;
+        }
 
-#delivery_date {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 150px;
-}
+        /* Правый блок формы: поля выбора даты и недели + кнопка генерации наклеек */
+        .form-right-section {
+            float: right;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-#week_number {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 150px;
-}
+        #delivery_date {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 150px;
+        }
 
-.generate-stickers-button {
-    padding: 8px 15px;
-    background-color: #1565c0;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    text-align: center;
-    transition: background-color 0.3s ease;
-}
+        #week_number {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 150px;
+        }
 
-.generate-stickers-button:hover {
-    background-color: #003c8f;
-}
+        .generate-stickers-button {
+            padding: 8px 15px;
+            background-color: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
 
-/* Очистка float */
-.clear {
-    clear: both;
-}
+        .generate-stickers-button:hover {
+            background-color: #003c8f;
+        }
 
+        /* Очистка float */
+        .clear {
+            clear: both;
+        }
 
-/* Таблица заказов */
-.order-summary-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+        /* Таблица заказов */
+        .order-summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-.order-summary-table th,
-.order-summary-table td {
-    border: 1px solid #ddd;
-    padding: 10px 12px; /* Сделали таблицу компактнее */
-    text-align: left;
-    font-size: 14px;
-}
+        .order-summary-table th,
+        .order-summary-table td {
+            border: 1px solid #ddd;
+            padding: 10px 12px; /* Сделали таблицу компактнее */
+            text-align: left;
+            font-size: 14px;
+        }
 
-.order-summary-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
+        .order-summary-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
 
-.order-summary-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+        .order-summary-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
-.order-summary-table tr.new-order {
-    background-color: #e8f5e9;
-    animation: highlightNewOrder 3s ease-in-out infinite alternate;
-}
+        .order-summary-table tr.new-order {
+            background-color: #e8f5e9;
+            animation: highlightNewOrder 3s ease-in-out infinite alternate;
+        }
 
-@keyframes highlightNewOrder {
-    0% {
-        background-color: #e8f5e9;
-    }
-    100% {
-        background-color: #c8e6c9;
-    }
-}
+        @keyframes highlightNewOrder {
+            0% {
+                background-color: #e8f5e9;
+            }
+            100% {
+                background-color: #c8e6c9;
+            }
+        }
 
-.order-summary-table tr.viewed-order {
-    animation: none;
-    background-color: #ffffff;
-}
+        .order-summary-table tr.viewed-order {
+            animation: none;
+            background-color: #ffffff;
+        }
 
-.order-summary-table tr:hover {
-    background-color: #f1f1f1;
-}
+        .order-summary-table tr:hover {
+            background-color: #f1f1f1;
+        }
 
-/* Пагинация */
-.pagination {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
 
-.pagination a {
-    color: #00796b;
-    padding: 6px 12px; /* Сделали кнопки пагинации компактнее */
-    text-decoration: none;
-    margin: 0 5px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
+        .pagination a {
+            color: #00796b;
+            padding: 6px 12px; /* Сделали кнопки пагинации компактнее */
+            text-decoration: none;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-.pagination a.active {
-    background-color: #004d40;
-    color: white;
-    border: 1px solid #004d40;
-}
+        .pagination a.active {
+            background-color: #004d40;
+            color: white;
+            border: 1px solid #004d40;
+        }
 
-.pagination a:hover:not(.active) {
-    background-color: #e0f2f1;
-}
+        .pagination a:hover:not(.active) {
+            background-color: #e0f2f1;
+        }
 
-/* Кнопки для редактирования и удаления */
-.edit-button,
-.delete-button {
-    padding: 8px 12px; /* Сделали кнопки компактнее */
-    border: none;
-    border-radius: 30px;
-    background-color: #1565c0;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    margin: 5px;
-}
+        /* Кнопки для редактирования и удаления */
+        .edit-button,
+        .delete-button {
+            padding: 8px 12px; /* Сделали кнопки компактнее */
+            border: none;
+            border-radius: 30px;
+            background-color: #1565c0;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
 
-.edit-button:hover {
-    background-color: #003c8f;
-}
+        .edit-button:hover {
+            background-color: #003c8f;
+        }
 
-.delete-button {
-    background-color: #d32f2f;
-}
+        .delete-button {
+            background-color: #d32f2f;
+        }
 
-.delete-button:hover {
-    background-color: #b71c1c;
-}
+        .delete-button:hover {
+            background-color: #b71c1c;
+        }
 
-/* Модальные окна */
-.modal {
-    position: fixed;
-    top: 50%; /* Изменено: Установили по центру экрана по вертикали */
-    left: 50%; /* Изменено: Установили по центру экрана по горизонтали */
-    transform: translate(-50%, -50%); /* Изменено: Центрируем окно по X и Y */
-    width: 40%; /* Можно оставить так же, или скорректировать по необходимости */
-    max-width: 500px; /* Ограничили максимальную ширину */
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 20px;
-    display: none;
-    z-index: 1000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    animation: fadeInModal 0.5s;
-}
+        /* Модальные окна */
+        .modal {
+            position: fixed;
+            top: 50%; /* Изменено: Установили по центру экрана по вертикали */
+            left: 50%; /* Изменено: Установили по центру экрана по горизонтали */
+            transform: translate(-50%, -50%); /* Изменено: Центрируем окно по X и Y */
+            width: 90%; /* Изменено: Увеличили ширину для мобильных устройств */
+            max-width: 500px; /* Ограничили максимальную ширину */
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeInModal 0.5s;
+        }
 
-@keyframes fadeInModal {
-    0% {
-        transform: translate(-50%, -70%);
-        opacity: 0;
-    }
-    100% {
-        transform: translate(-50%, -50%);
-        opacity: 1;
-    }
-}
+        @keyframes fadeInModal {
+            0% {
+                transform: translate(-50%, -70%);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    margin-bottom: 15px;
-}
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
 
-.modal-header h3 {
-    margin: 0;
-    color: #1565c0;
-}
+        .modal-header h3 {
+            margin: 0;
+            color: #1565c0;
+        }
 
-.modal-content {
-    padding: 10px 0;
-    font-size: 14px;
-    max-height: 300px; /* Ограничили максимальную высоту модального окна */
-    overflow-y: auto; /* Добавили прокрутку для модального окна */
-}
+        .modal-content {
+            padding: 10px 0;
+            font-size: 14px;
+            max-height: 300px; /* Ограничили максимальную высоту модального окна */
+            overflow-y: auto; /* Добавили прокрутку для модального окна */
+        }
 
-.modal-close {
-    font-size: 1.5rem;
-    color: #d32f2f;
-    cursor: pointer;
-    transition: color 0.3s;
-}
+        .modal-close {
+            font-size: 1.5rem;
+            color: #d32f2f;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
 
-.modal-close:hover {
-    color: #b71c1c;
-}
+        .modal-close:hover {
+            color: #b71c1c;
+        }
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    display: none;
-    z-index: 500;
-    display: flex; /* Добавлено: Flex для центровки */
-    justify-content: center; /* Добавлено: Центрируем по горизонтали */
-    align-items: center; /* Добавлено: Центрируем по вертикали */
-}
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 500;
+            display: flex; /* Добавлено: Flex для центровки */
+            justify-content: center; /* Добавлено: Центрируем по горизонтали */
+            align-items: center; /* Добавлено: Центрируем по вертикали */
+        }
 
-.modal-delete-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
+        .modal-delete-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
 
-.modal-delete-buttons button {
-    width: 48%;
-}
+        .modal-delete-buttons button {
+            width: 48%;
+        }
 
-@media screen and (max-width: 768px) {
-    .filter-container {
-        grid-template-columns: 1fr;
-    }
+        @media screen and (max-width: 768px) {
+            .filter-container {
+                grid-template-columns: 1fr;
+            }
 
-    .filter-form {
-        flex-direction: column;
-    }
+            .filter-form {
+                flex-direction: column;
+            }
 
-    .filter-container .generate-stickers-container {
-        align-items: center;
-    }
+            .filter-container .generate-stickers-container {
+                align-items: center;
+            }
 
-    .order-summary-table th,
-    .order-summary-table td {
-        padding: 8px;
-    }
+            .order-summary-table th,
+            .order-summary-table td {
+                padding: 8px;
+            }
 
-    .pagination a {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-}
+            .pagination a {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
 
+            .info-container {
+                flex-direction: column;
+                align-items: center;
+            }
 
-</style>
+            .packages-info,
+            .client-count {
+                width: 100%;
+                text-align: center;
+            }
 
+            .client-count {
+                margin-bottom: 20px;
+            }
+
+            .modal {
+                width: 95%;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .filter-form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .form-left-section,
+            .form-right-section {
+                justify-content: center;
+            }
+
+            .status-filter-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .order-summary-table th,
+            .order-summary-table td {
+                padding: 6px;
+                font-size: 12px;
+            }
+
+            .pagination a {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+
+            .modal {
+                width: 98%;
+            }
+        }
+    </style>
 
 </body>
 </html>

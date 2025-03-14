@@ -5,7 +5,7 @@ ini_set('log_errors', 1);
 ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/logs/error_log.log');
 
 // Старт сессии для защиты от CSRF
-session_start();
+
 
 // Генерация CSRF токена и сохранение в сессии, если его нет
 if (empty($_SESSION['csrf_token'])) {
@@ -184,6 +184,99 @@ include $_SERVER['DOCUMENT_ROOT'] . '/includes/header.php'; // Подключа�
 
     <a href="/admin/admin_panel.php" class="btn-return">Повернутись в адмін-панель</a>
 </div>
+<style>
+@media (max-width: 1024px) {
+    .admin-container {
+        padding: 10px;
+    }
 
+    .price-table {
+        font-size: 14px;
+    }
+
+    .price-table th, .price-table td {
+        padding: 8px;
+    }
+
+    .action-form input[type="number"] {
+        width: 80px;
+    }
+
+    .btn-update, .btn-delete, .btn-add {
+        font-size: 14px;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .price-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .price-table th, .price-table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    .form-group {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .form-group input {
+        width: 100%;
+        max-width: 300px;
+        margin: 5px auto;
+    }
+
+    .btn-update, .btn-delete, .btn-add {
+        width: 100%;
+        max-width: 300px;
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .btn-return {
+        display: block;
+        text-align: center;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 5px;
+    }
+
+    .price-table th, .price-table td {
+        padding: 4px;
+        font-size: 10px;
+    }
+
+    .action-form input[type="number"] {
+        width: 60px;
+        font-size: 12px;
+    }
+
+    .btn-update, .btn-delete, .btn-add {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    .form-group input {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .btn-return {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+</style>
 </body>
 </html>

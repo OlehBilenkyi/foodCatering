@@ -172,30 +172,41 @@ if ($packages && is_array($packages)) {
             $orderPackageId = $pdo->lastInsertId();
             error_log("Создан новый пакет с ID: " . $orderPackageId);
 
-            // Разделение дат, если они пришли в одной строке
-            $deliveryDates = [];
-            foreach ($package['dates'] as $deliveryDate) {
-                // Если даты объединены в строку, разбиваем её
-                if (strpos($deliveryDate, ',') !== false) {
-                    $deliveryDates = array_merge($deliveryDates, array_map('trim', explode(',', $deliveryDate)));
-                } else {
-                    $deliveryDates[] = trim($deliveryDate);
-                }
-            }
+           // Разделение и проверка дат
+$deliveryDates = [];
+foreach ($package['dates'] as $deliveryDate) {
+    if (strpos($deliveryDate, ',') !== false) {
+        $splitDates = array_map('trim', explode(',', $deliveryDate));
+        $deliveryDates = array_merge($deliveryDates, $splitDates);
+    } else {
+        $deliveryDates[] = trim($deliveryDate);
+    }
+}
 
-            // Сохранение всех дат доставки в таблице delivery_dates
-            foreach ($deliveryDates as $deliveryDate) {
-                error_log("Сохранение даты доставки: " . $deliveryDate);
-                $stmt = $pdo->prepare("
-                    INSERT INTO delivery_dates (order_package_id, delivery_date)
-                    VALUES (:order_package_id, :delivery_date)
-                ");
-                $stmt->execute([
-                    ':order_package_id' => $orderPackageId,
-                    ':delivery_date' => $deliveryDate
-                ]);
-                error_log("Дата доставки " . $deliveryDate . " успешно сохранена для order_package_id: " . $orderPackageId);
-            }
+// Подготовка массовой вставки (batch insert) и валидация дат
+$validDates = [];
+$params = [];
+foreach ($deliveryDates as $key => $deliveryDate) {
+    // Проверка формата даты YYYY-MM-DD
+    if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $deliveryDate)) {
+        $validDates[] = "(:order_package_id, :delivery_date_$key)";
+        $params[":delivery_date_$key"] = $deliveryDate;
+    } else {
+        error_log("Некорректная дата была пропущена: " . $deliveryDate);
+    }
+}
+
+// Массовая вставка, если есть валидные даты
+if (!empty($validDates)) {
+    $sql = "INSERT INTO delivery_dates (order_package_id, delivery_date) VALUES " . implode(", ", $validDates);
+    $stmt = $pdo->prepare($sql);
+    $params[':order_package_id'] = $orderPackageId;
+    $stmt->execute($params);
+    error_log("Даты доставки успешно сохранены для order_package_id: " . $orderPackageId);
+} else {
+    error_log("Нет корректных дат для вставки в базу данных (order_package_id: $orderPackageId).");
+}
+
         } catch (PDOException $e) {
             error_log("Ошибка записи в базу данных пакетов: " . $e->getMessage());
             http_response_code(500);

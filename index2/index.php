@@ -648,6 +648,8 @@ function getOrderDetails() {
         // Извлекаем все даты из элементов .pay-full-card__dates
         const dates = Array.from(datesElements).map(dateElement => dateElement.textContent.trim()).filter(date => date);
 
+console.log('Извлеченные даты:', dates);
+
         // Проверяем корректность данных
         if (calories && quantity && dates.length > 0 && pricePerPackage && totalCost) {
             const packageData = {

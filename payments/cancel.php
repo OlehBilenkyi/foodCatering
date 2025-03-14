@@ -57,6 +57,26 @@ include $_SERVER['DOCUMENT_ROOT'] . '/config/db.php'; // Подключаем б
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../assets/css/global.css">
+    
+    <style>
+        .info-block__actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .info-block__cancel{
+        display: flex;
+        justify-content: space-evenly;
+        padding-bottom: 30px;
+        gap: 10px;
+    }
+    
+    
+    </style>
+    
+    
 </head>
 <body>
   <?php  include $_SERVER['DOCUMENT_ROOT'] . '/includes/header.php'; // Подключаем шапку ?>
@@ -77,7 +97,10 @@ include $_SERVER['DOCUMENT_ROOT'] . '/config/db.php'; // Подключаем б
 
         <div class="info-block__actions">
             <a href="/" class="btn">Strona główna</a>
-            <a href="/index2" class="btn">Złóż zamówienie</a>
+            <div class="info-block__cancel">
+                <a href="/index2/" class="btn">Standardowe menu</a>
+    <a href="/menu_do_wyboru/" class="btn">Menu do wyboru</a>
+            </div>
         </div>
           
       </div>

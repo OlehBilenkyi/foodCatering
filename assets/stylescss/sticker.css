@@ -180,13 +180,44 @@ body {
 }
 
 @media print {
+  @page {
+    size: A4;
+    margin: 2mm;
+  }
+
+  html, body {
+    width: 210mm;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+  }
+
   .container {
-    page-break-before: always; /* Принудительный разрыв перед первой страницей */
-    page-break-after: always; /* Принудительный разрыв страницы после контейнера */
-    page-break-inside: avoid; /* Запрещаем разрыв внутри контейнера */
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 70mm);
+    grid-auto-rows: 37mm;
+    gap: 0;
+    justify-content: start;
+    align-content: start;
   }
 
   .sticker {
-    page-break-inside: avoid; /* Запрещаем разрыв страницы внутри наклейки */
+    width: 70mm;
+    height: 37mm;
+    padding: 2mm;
+    overflow: hidden;
+    font-size: 8px;
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: none;
+  }
+
+  /* Создаём разрыв страницы после каждой 21-й наклейки */
+  .sticker:nth-child(21n) {
+    page-break-after: always;
   }
 }
+
+
