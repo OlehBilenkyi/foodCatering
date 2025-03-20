@@ -556,78 +556,97 @@ document.addEventListener("click", e => {
 });
 
 class i {
-    constructor(category, section) {
-        this.category = category;
-        this.section = section;
-        this.buttons = section.querySelectorAll(".pay-item__btn");
-        this.menuItems = section.querySelectorAll(`.menu-items_${category} .menu-item`);
-        this.fieldWeight = section.querySelector(`input[id^="hidden-${category}-data-weight"]`);
-        this.fieldPrice = section.querySelector(`input[id^="hidden-${category}-data-price"]`);
-        this.hiddenDishField = section.querySelector(`input[id^="hidden-${category}"][name^="hidden-${category}-menu-item-pay-full-card"]`);
-        if (this.fieldWeight && this.fieldPrice && this.hiddenDishField && this.buttons.length && this.menuItems.length) {
-            this.init();
-        }
-    }
+  constructor(category, section) {
+    this.category = category;
+    this.section = section;
+    this.buttons = section.querySelectorAll(".pay-item__btn");
+    this.menuItems = section.querySelectorAll(`.menu-items_${category} .menu-item`);
+    this.fieldWeight = section.querySelector(`input[id^="hidden-${category}-data-weight"]`);
+    this.fieldPrice = section.querySelector(`input[id^="hidden-${category}-data-price"]`);
+    this.hiddenDishField = section.querySelector(
+      `input[id^="hidden-${category}"][name^="hidden-${category}-menu-item-pay-full-card"]`
+    );
 
-    init() {
-        this.resetState();
-        this.buttons.forEach((btn) => {
-            btn.addEventListener("click", () => {
-                this.selectWeight(btn);
-                this.syncOrderManager();
-                r.updateAcceptCheckboxState();
-            });
-        });
-        this.menuItems.forEach((menuItem) => {
-            menuItem.addEventListener("click", () => {
-                this.selectMenuCard(menuItem);
-                this.syncOrderManager();
-                r.updateAcceptCheckboxState();
-            });
-        });
+    if (this.fieldWeight && this.fieldPrice && this.hiddenDishField && this.buttons.length && this.menuItems.length) {
+      this.init();
     }
+  }
 
-    resetState() {
-        this.buttons.forEach((btn) => btn.classList.remove("active"));
-        this.menuItems.forEach((menuItem) => {
-            menuItem.classList.remove("selected");
-            menuItem.classList.add("disabled");
-        });
-        this.fieldWeight.value = "0";
-        this.fieldPrice.value = "0";
-        this.hiddenDishField.value = "";
-    }
-
-    selectWeight(btn) {
-        this.buttons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        this.fieldWeight.value = btn.dataset.weight || "0";
-        this.fieldPrice.value = btn.dataset.price || "0";
-        this.menuItems.forEach((menuItem) => menuItem.classList.remove("disabled"));
+  init() {
+    this.resetState();
+    this.buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        this.selectWeight(btn);
         this.syncOrderManager();
-    }
-
-    selectMenuCard(menuItem) {
-        if (menuItem.classList.contains("disabled")) return;
-        this.menuItems.forEach((mi) => mi.classList.remove("selected"));
-        menuItem.classList.add("selected");
-        const dishName = menuItem.querySelector(".menu-card__heading h6")?.textContent || "";
-        this.hiddenDishField.value = dishName;
+        r.updateAcceptCheckboxState();
+      });
+    });
+    this.menuItems.forEach((menuItem) => {
+      menuItem.addEventListener("click", () => {
+        this.selectMenuCard(menuItem);
         this.syncOrderManager();
+        r.updateAcceptCheckboxState();
+      });
+    });
+  }
+
+  resetState() {
+    this.buttons.forEach((btn) => btn.classList.remove("active"));
+    this.menuItems.forEach((menuItem) => menuItem.classList.remove("selected"));
+    this.fieldWeight.value = "0";
+    this.fieldPrice.value = "0";
+    this.hiddenDishField.value = "";
+  }
+
+  selectWeight(btn) {
+    this.buttons.forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const weight = btn.dataset.weight || "0";
+    const price = btn.dataset.price || "0";
+
+    this.fieldWeight.value = weight;
+    this.fieldPrice.value = price;
+
+    this.syncOrderManager();
+  }
+
+  selectMenuCard(menuItem) {
+    this.menuItems.forEach((mi) => mi.classList.remove("selected"));
+    menuItem.classList.add("selected");
+
+    const dishName = menuItem.querySelector(".menu-card__heading h6")?.textContent || "";
+    this.hiddenDishField.value = dishName;
+
+    const menuOptionsField = this.section.querySelector(
+      `input.selected-menu-options-id[name^="selected_${this.category}_menu_options_id"]`
+    );
+    let menuOptionsId = "";
+    if (menuOptionsField) {
+      menuOptionsId = menuItem.getAttribute("data-menu-options-id") || "";
+      menuOptionsField.value = menuOptionsId;
     }
 
-    syncOrderManager() {
-        a.updateTotalInfo();
-        a.saveOrderDataToStorage();
-        a.updateOrderSummary();
-    }
+    this.syncOrderManager();
+  }
 
-    isComplete() {
-        return this.fieldWeight.value.trim() !== "0" &&
-            this.fieldPrice.value.trim() !== "0" &&
-            [...this.menuItems].some((item) => item.classList.contains("selected"));
-    }
+  syncOrderManager() {
+    a.updateTotalInfo();
+    a.saveOrderDataToStorage();
+    a.updateOrderSummary();
+  }
+
+  isComplete() {
+    const isWeightSet = this.fieldWeight.value.trim() !== "0";
+    const isPriceSet = this.fieldPrice.value.trim() !== "0";
+    const isMenuSelected = [...this.menuItems].some((item) => item.classList.contains("selected"));
+    return isWeightSet && isPriceSet && isMenuSelected;
+  }
 }
+
+
+
+
 
 class r {
     static categories = [];
@@ -837,7 +856,7 @@ const n = (e, i = null) => {
 
   // Вычисляем минимальную дату: завтрашний день или послезавтра, если время >= 21:00
   const minDate = new Date(today);
-  minDate.setDate(today.getDate() + (now.getHours() >= 21 ? 2 : 1));
+  minDate.setDate(today.getDate() + 2);
 
   new AirDatepicker(e, {
   locale: {
@@ -977,20 +996,21 @@ window.addEventListener("beforeunload", () => {
     };
 
     // Преобразует элементы заказа, добавляя поле category и menu_options_id
-    mapOrderItems = (items = [], categoryKey, selectedMenuOption = null) => {
-      const categoryMap = {
-        sniad: 'śniadanie',
-        obiad: 'obiad',
-        kolacja: 'kolacja'
-      };
-      return items.map(item => ({
-        dish_name: item.value || item.dish_name || '',
-        weight: item.weight,
-        price: item.price,
-        category: categoryMap[categoryKey] || categoryKey,
-        menu_options_id: selectedMenuOption // Значение из скрытого поля для соответствующей категории
-      }));
-    };
+   mapOrderItems = (items = [], categoryKey) => {
+  const categoryMap = {
+    sniad: 'śniadanie',
+    obiad: 'obiad',
+    kolacja: 'kolacja'
+  };
+  return items.map(item => ({
+    dish_name: item.value || item.dish_name || '',
+    weight: item.weight,
+    price: item.price,
+    category: categoryMap[categoryKey] || categoryKey,
+    menu_options_id: item.menu_options_id // Берем индивидуальное значение из объекта
+  }));
+};
+
 
     // Собирает данные заказа из формы и OrderManager
     getOrderDetails = () => {
@@ -1026,39 +1046,32 @@ window.addEventListener("beforeunload", () => {
       const selectedKolacjaIds = getAllMenuOptionsIds('kolacja');
 
       let orderDays = [];
-      if (Array.isArray(orderData.orders) && orderData.orders.length > 0) {
-        orderDays = orderData.orders.map(order => {
-          let computedDayTotal = 0;
-          let items = [];
-          const categories = ['sniad', 'obiad', 'kolacja'];
-          categories.forEach((cat) => {
-            if (Array.isArray(order[cat])) {
-              order[cat].forEach(item => {
-                computedDayTotal += parseFloat(item.price) || 0;
-              });
-              // Выбираем соответствующее значение menu_options_id для категории
-              let selectedOptions = [];
-              if (cat === 'sniad') selectedOptions = selectedSniadIds;
-              else if (cat === 'obiad') selectedOptions = selectedObiadIds;
-              else if (cat === 'kolacja') selectedOptions = selectedKolacjaIds;
-
-              items = items.concat(this.mapOrderItems(order[cat], cat, selectedOptions));
-            }
-          });
-          // Преобразуем дату в формат YYYY-MM-DD, если она содержит точки (например, dd.mm.yyyy)
-          let formattedDate = order.date;
-          if (order.date.includes('.')) {
-            const parts = order.date.split('.');
-            if (parts.length === 3) {
-              formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-            }
-          }
-          return {
-            delivery_date: formattedDate,
-            day_total_price: computedDayTotal.toFixed(2),
-            items: items
-          };
+if (Array.isArray(orderData.orders) && orderData.orders.length > 0) {
+  orderDays = orderData.orders.map(order => {
+    let computedDayTotal = 0;
+    let items = [];
+    const categories = ['sniad', 'obiad', 'kolacja'];
+    categories.forEach((cat) => {
+      if (Array.isArray(order[cat])) {
+        order[cat].forEach(item => {
+          computedDayTotal += parseFloat(item.price) || 0;
         });
+        items = items.concat(this.mapOrderItems(order[cat], cat));
+      }
+    });
+    let formattedDate = order.date;
+    if (order.date.includes('.')) {
+      const parts = order.date.split('.');
+      if (parts.length === 3) {
+        formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+    }
+    return {
+      delivery_date: formattedDate,
+      day_total_price: computedDayTotal.toFixed(2),
+      items: items
+    };
+  });
       }
 
       if (orderDays.length === 0) {
