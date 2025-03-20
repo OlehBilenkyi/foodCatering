@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generowanie Naklejek - Sydochki</title>
     <link rel="stylesheet" href="/assets/stylescss/sticker.css">
+    <style>
+        .net_mass_container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 7px;
+    margin: 0;
+    padding: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container" id="stickers-container"></div>
@@ -44,25 +54,34 @@
             response.packages.forEach(pkg => {
                 if (!pkg.package || !pkg.title_text || !pkg.ingredients) return;
 
-               // Категория с первой буквой заглавной
-let categoryText = "";
-switch (pkg.package) {
-    case "śniadanie":
-        categoryText = "S";
-        break;
-    case "obiad":
-        categoryText = "O";
-        break;
-    case "kolacja":
-        categoryText = "K";
-        break;
-}
+                // Категория с первой буквой заглавной
+                let categoryText = "";
+                switch (pkg.package) {
+                    case "śniadanie":
+                        categoryText = "S";
+                        break;
+                    case "obiad":
+                        categoryText = "O";
+                        break;
+                    case "kolacja":
+                        categoryText = "K";
+                        break;
+                }
 
-// Вставляем `categoryText` в `infoText`
-const infoText = ` ${categoryText} - ${pkg.menu_options_id} - 
-   ${pkg.weight || "указано"} - ${pkg.order_id || "не указано"}`;
+                // Собираем нужный текст
+                const infoText = ` ${categoryText} - ${pkg.menu_options_id} - 
+                   ${pkg.weight || "указано"} - ${pkg.order_id || "не указано"}`;
 
+                // Умножаем значения на вес
+                // (если pkg.energy или pkg.weight пустые, Number() вернет NaN, 
+                //  поэтому можно добавить проверки или обработку по вкусу)
+                const energyMultiplied = (Number(pkg.energy) * Number(pkg.weight)).toFixed(2);
+                const fatMultiplied = (Number(pkg.fat) * Number(pkg.weight)).toFixed(2);
+                const carbsMultiplied = (Number(pkg.carbohydrates) * Number(pkg.weight)).toFixed(2);
+                const proteinMultiplied = (Number(pkg.protein) * Number(pkg.weight)).toFixed(2);
+                const saltMultiplied = (Number(pkg.salt) * Number(pkg.weight)).toFixed(2);
 
+                // Формируем HTML с уже умноженными значениями
                 const stickerHTML = `
                     <div class="sticker">
                         <div class="title">
@@ -79,20 +98,28 @@ const infoText = ` ${categoryText} - ${pkg.menu_options_id} -
                         <div class="desc">
                             <h2 class="desc__title">Wartość odżywcza w porcji:</h2>
                             <div class="portion">
-                                <div class="energy">Energia: <strong>${pkg.energy}</strong> kcal</div>
-                                <div class="fat">Tłuszcz: <strong>${pkg.fat}</strong> g</div>
-                                <div class="carbohydrates">Węglowodany: <strong>${pkg.carbohydrates}</strong> g</div>
-                                <div class="protein">Białko: <strong>${pkg.protein}</strong> g</div>
-                                <div class="sol">Sól: <strong>${pkg.salt}</strong> g</div>
+                                <div class="energy">Energia: <strong>${energyMultiplied}</strong> kcal</div>
+                                <div class="fat">Tłuszcz: <strong>${fatMultiplied}</strong> g</div>
+                                <div class="carbohydrates">Węglowodany: <strong>${carbsMultiplied}</strong> g</div>
+                                <div class="protein">Białko: <strong>${proteinMultiplied}</strong> g</div>
+                                <div class="sol">Sól: <strong>${saltMultiplied}</strong> g</div>
                             </div>
                             <div class="desc__dowm">Wartość odżywcza jest przybliżona i może się różnić.</div>
                         </div>
                         <div class="footer">
                             <div class="footer__text">Przechowywać w temperaturze od 0°C do 8°C. Po otrzymaniu spożyć w ciągu 24 godzin.</div>
                         </div>
-                        <div class="net_mass_container">
-                            <div class="data_right">Data: ${pkg.delivery_date}</div>
+                         <div class="net_mass_container">
+                            <div class="net_mass_left">
+                             Masa netto: <strong>${pkg.weight}</strong><br/>
+                             Możliwa tolerancja wagowa: ±10%
                         </div>
+                        <div class="data_right">
+                            Data: ${pkg.delivery_date}
+                        </div>
+                        </div> 
+                        
+                    
                     </div>
                 `;
 
@@ -102,5 +129,6 @@ const infoText = ` ${categoryText} - ${pkg.menu_options_id} -
             setTimeout(() => window.print(), 500);
         }
     </script>
+    
 </body>
 </html>

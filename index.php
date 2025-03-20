@@ -89,10 +89,10 @@ Dostawa gotowych posiłków
 </defs>
 </svg>
 </span>
-Nasze opakowanie nie szkodzi nature..
+Nasze opakowanie nie szkodzi nature.
 </p>
 </div>
-<a href=#menu class="btn promo__btn js-scroll-link">Zobacz menu</a>
+
 </div>
 <img src=../assets/img/promo/1.png alt="">
 </div>
@@ -126,7 +126,7 @@ Nasze opakowanie nie szkodzi nature..
 <div class="menu__tab <?= $weekIndex === 0 ? 'active' : '' ?>">
 <div class=menu__head>
 <div class=menu__title>
-<?php $startDate=new DateTime($weekDates[$weekIndex]['start']);$endDate=new DateTime($weekDates[$weekIndex]['end']);$startFormatted=$startDate->format('d.m');$endFormatted=$endDate->format('d.m'); ?>Tydzień<?=$weekIndex+1?>:<?=$startFormatted?>-<?=$endFormatted?>
+<?php $startDate=new DateTime($weekDates[$weekIndex]['start']);$endDate=new DateTime($weekDates[$weekIndex]['end']);$startFormatted=$startDate->format('d.m');$endFormatted=$endDate->format('d.m'); ?>Tydzień:<?=$startFormatted?>-<?=$endFormatted?>
 </div>
 <div class="day-nav menu__day-nav">
 <?php foreach ($weekDays as $dayIndex => $dayDate): ?>

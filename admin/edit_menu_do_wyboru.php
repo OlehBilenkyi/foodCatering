@@ -16,8 +16,6 @@ ini_set('log_errors', 1);
 ini_set('error_log', $_SERVER['DOCUMENT_ROOT'] . '/logs/error_log.log');
 error_reporting(E_ALL);
 
-
-
 // Генерация CSRF-токена, если он еще не установлен
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -127,12 +125,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dish_description = htmlspecialchars(trim($_POST['dish_description'] ?? ''));
         $dish_ingredients = htmlspecialchars(trim($_POST['dish_ingredients'] ?? ''));
         $dish_allergens = htmlspecialchars(trim($_POST['dish_allergens'] ?? ''));
-        $dish_energy = htmlspecialchars(trim($_POST['dish_energy'] ?? ''));
-        $dish_fat = htmlspecialchars(trim($_POST['dish_fat'] ?? ''));
-        $dish_carbohydrates = htmlspecialchars(trim($_POST['dish_carbohydrates'] ?? ''));
-        $dish_protein = htmlspecialchars(trim($_POST['dish_protein'] ?? ''));
-        $dish_salt = htmlspecialchars(trim($_POST['dish_salt'] ?? ''));
-        $dish_net_mass = htmlspecialchars(trim($_POST['dish_net_mass'] ?? ''));
+        $dish_energy = filter_var(trim($_POST['dish_energy'] ?? ''), FILTER_VALIDATE_FLOAT);
+        $dish_fat = filter_var(trim($_POST['dish_fat'] ?? ''), FILTER_VALIDATE_FLOAT);
+        $dish_carbohydrates = filter_var(trim($_POST['dish_carbohydrates'] ?? ''), FILTER_VALIDATE_FLOAT);
+        $dish_protein = filter_var(trim($_POST['dish_protein'] ?? ''), FILTER_VALIDATE_FLOAT);
+        $dish_salt = filter_var(trim($_POST['dish_salt'] ?? ''), FILTER_VALIDATE_FLOAT);
+        $dish_net_mass = filter_var(trim($_POST['dish_net_mass'] ?? ''), FILTER_VALIDATE_FLOAT);
+
+        // Проверка на корректность числовых значений
+        if ($dish_energy === false || $dish_fat === false || $dish_carbohydrates === false || $dish_protein === false || $dish_salt === false || $dish_net_mass === false) {
+            throw new Exception("Invalid numeric values. Please enter valid numbers.");
+        }
 
         // Если новое изображение не выбрано, оставляем текущее
         if (isset($_FILES["dish_image"]) && $_FILES["dish_image"]["error"] === UPLOAD_ERR_OK) {
@@ -380,17 +383,17 @@ $menuOptions = getMenuOptions($pdo);
                     <label for="dish_allergens">Алергени:</label>
                     <textarea id="dish_allergens" name="dish_allergens"></textarea><br>
                     <label for="dish_energy">Енергія страви (ккал):</label>
-                    <input type="number" id="dish_energy" name="dish_energy"><br>
+                    <input type="number" step="0.000000000000001" id="dish_energy" name="dish_energy"><br>
                     <label for="dish_fat">Жири (г):</label>
-                    <input type="number" id="dish_fat" name="dish_fat"><br>
+                    <input type="number" step="0.000000000000001" id="dish_fat" name="dish_fat"><br>
                     <label for="dish_carbohydrates">Вуглеводи (г):</label>
-                    <input type="number" id="dish_carbohydrates" name="dish_carbohydrates"><br>
+                    <input type="number" step="0.000000000000001" id="dish_carbohydrates" name="dish_carbohydrates"><br>
                     <label for="dish_protein">Білки (г):</label>
-                    <input type="number" id="dish_protein" name="dish_protein"><br>
+                    <input type="number" step="0.000000000000001" id="dish_protein" name="dish_protein"><br>
                     <label for="dish_salt">Сіль (г):</label>
-                    <input type="number" id="dish_salt" name="dish_salt"><br>
+                    <input type="number" step="0.000000000000001" id="dish_salt" name="dish_salt"><br>
                     <label for="dish_net_mass">Маса страви (g):</label>
-                    <input type="number" id="dish_net_mass" name="dish_net_mass"><br>
+                    <input type="number" step="0.000000000000001" id="dish_net_mass" name="dish_net_mass"><br>
                     <button type="submit">Зберегти зміни</button>
                 </form>
             </div>
@@ -427,19 +430,19 @@ $menuOptions = getMenuOptions($pdo);
                     <label for="dish_allergens">Алергени:</label>
                     <textarea name="dish_allergens"></textarea><br>
                     <label for="dish_energy">Енергія страви (ккал):</label>
-                    <input type="number" step="0.01" name="dish_energy"><br>
+                    <input type="number" step="0.000000000000001" name="dish_energy"><br>
                     <label for="dish_fat">Жири (г):</label>
-                    <input type="number" step="0.01" name="dish_fat"><br>
+                    <input type="number" step="0.000000000000001" name="dish_fat"><br>
                 </div>
                 <div class="formi">
                     <label for="dish_carbohydrates">Вуглеводи (г):</label>
-                    <input type="number" step="0.01" name="dish_carbohydrates"><br>
+                    <input type="number" step="0.000000000000001" name="dish_carbohydrates"><br>
                     <label for="dish_protein">Білки (г):</label>
-                    <input type="number" step="0.01" name="dish_protein"><br>
+                    <input type="number" step="0.000000000000001" name="dish_protein"><br>
                     <label for="dish_salt">Сіль (г):</label>
-                    <input type="number" step="0.01" name="dish_salt"><br>
+                    <input type="number" step="0.000000000000001" name="dish_salt"><br>
                     <label for="dish_net_mass">Маса страви (g):</label>
-                    <input type="number" step="0.01" name="dish_net_mass"><br>
+                    <input type="number" step="0.000000000000001" name="dish_net_mass"><br>
                 </div>
             </div>
             <div class="bS">
