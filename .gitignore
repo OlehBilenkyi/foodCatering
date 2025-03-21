@@ -1,7 +1,7 @@
 # Ignoring environment configuration file
 .env
 
-# Node modules (если вы используете Node.js)
+# Node modules (если используете Node.js)
 node_modules/
 
 # Log files
@@ -10,7 +10,16 @@ logs/
 
 # Composer vendor folder (если используете PHP и Composer)
 vendor/
+composer.lock
+composer.phar
 
 # System files
 .DS_Store
 Thumbs.db
+
+# Uploads (загруженные файлы)
+uploads.img/
+uploads_img_menu_do_wyboru/
+
+# .htaccess (если содержит конфиденциальные данные)
+.htaccess
